@@ -31,14 +31,15 @@
 		"stars": 3
 	},
 	{
-		"name": "Nucleo",
-		"url": "https://nucleoapp.com/app/?library=core",
-		"logo": "/images/share/7e720f35557fa9de.svg",
-		"description": "图标库，网站整体很干净。独特的是，它有一类像素风格的图标，很有意思。它的 icon 也很多，还有 grass 风格的。",
+		"name": "Magic UI",
+		"url": "https://magicui.design/",
+		"logo": "https://magicui.design/favicon.ico",
+		"description": "shadcn/ui 伴生库，有很多实用设计。取用也很方便，可以自己复制独立的代码。",
 		"tags": [
-			"Icons"
+			"组件",
+			"Github"
 		],
-		"stars": 3
+		"stars": 4
 	},
 	{
 		"name": "Awwwards",
@@ -51,42 +52,12 @@
 		"stars": 3
 	},
 	{
-		"name": "CSS Design Awards",
-		"url": "https://www.cssdesignawards.com/",
-		"logo": "/images/share/aaae2bf4f74c8eb1.svg",
-		"description": "网站评选网站，跟 Awwwards 类似，可以看到每期的优秀网站。观感上会好些。",
-		"tags": [
-			"网站集"
-		],
-		"stars": 3
-	},
-	{
-		"name": "Making Software",
-		"logo": "https://www.makingsoftware.com/favicon.ico",
-		"url": "https://www.makingsoftware.com/",
-		"description": "面向软件设计和开发人员的参考手册。样式很棒的学习网站。",
-		"tags": [
-			"学习"
-		],
-		"stars": 4
-	},
-	{
 		"name": "Ease 函数参考",
 		"logo": "https://easings.net/96.8aa68ac4.png",
 		"url": "https://easings.net/",
 		"description": "当你在调整动画节奏时，这个 ease 表能帮助直观感受 ease 表现出的效果",
 		"tags": [
 			"Github"
-		],
-		"stars": 3
-	},
-	{
-		"name": "Isocons",
-		"logo": "/images/share/97859f1c57799dd2.png",
-		"url": "https://www.isocons.app/",
-		"description": "3D icons 网站，酷酷的，免费。",
-		"tags": [
-			"Icons"
 		],
 		"stars": 3
 	},
