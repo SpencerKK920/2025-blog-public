@@ -61,6 +61,13 @@
 			"value": "https://space.bilibili.com/361813534?",
 			"label": "",
 			"order": 3
+		},
+		{
+			"id": "button-1768826023422",
+			"type": "instagram",
+			"value": "",
+			"label": "",
+			"order": 4
 		}
 	],
 	"clockShowSeconds": false,
