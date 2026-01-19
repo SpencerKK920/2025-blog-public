@@ -65,9 +65,16 @@
 		{
 			"id": "button-1768826023422",
 			"type": "instagram",
-			"value": "",
+			"value": "https://www.instagram.com/maxjon287/",
 			"label": "",
 			"order": 4
+		},
+		{
+			"id": "button-1768829289945",
+			"type": "link",
+			"value": "https://www.notion.so/All-in-one-11ddedd7077580acaa52d1bdb4d7b969",
+			"label": "",
+			"order": 5
 		}
 	],
 	"clockShowSeconds": false,
