@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
     // 你的 B 站 UID
-    const BILIBILI_UID = "你的UID" 
+    const BILIBILI_UID = "361813534" 
 
     try {
         let allItems: any[] = []
