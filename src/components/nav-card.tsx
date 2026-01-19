@@ -56,8 +56,8 @@ const list = [
 		href: '/bloggers'
 	},
 	{
-		icon: PlayIcon,       // 未选中时的图标
-		iconActive: PlayIcon, // 选中时的图标（如果没有对应的 Filled 版本，可以暂时用同一个）
+		icon: WebsiteOutlineSVG,       // 未选中时的图标
+		iconActive: WebsiteOutlineSVG, // 选中时的图标（如果没有对应的 Filled 版本，可以暂时用同一个）
 		label: '追番记录',
 		href: '/anime'
 	}
