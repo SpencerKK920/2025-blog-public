@@ -54,6 +54,13 @@
 			"value": "3043819560@qq.com",
 			"label": "",
 			"order": 1
+		},
+		{
+			"id": "button-1768824441543",
+			"type": "bilibili",
+			"value": "https://space.bilibili.com/361813534?",
+			"label": "",
+			"order": 3
 		}
 	],
 	"clockShowSeconds": false,
