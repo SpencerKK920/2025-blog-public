@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-    // 你的 B 站 UID
+    // 你的 B 站数字 UID
     const BILIBILI_UID = "361813534" 
 
     try {
@@ -9,8 +9,8 @@ export async function GET() {
         let pn = 1
         let hasMore = true
 
-        // 参考 RyuChan 的自动翻页抓取逻辑
-        while (hasMore && pn <= 10) { // 安全起见最多抓取10页
+        // 模拟 RyuChan 的多页抓取逻辑，确保获取全部追番
+        while (hasMore && pn <= 10) {
             const res = await fetch(
                 `https://api.bilibili.com/x/space/bangumi/follow/list?type=1&vmid=${BILIBILI_UID}&pn=${pn}&ps=30`,
                 {
@@ -34,13 +34,13 @@ export async function GET() {
             }
         }
 
-        // 数据标准化处理
+        // 标准化数据结构，适配前端渲染
         const formattedData = allItems.map(item => ({
             id: item.season_id,
             title: item.title,
-            // 图片处理：支持 B 站 WebP 压缩并强制 HTTPS
+            // 强制 HTTPS 并使用 WebP 压缩后缀
             cover: item.cover.replace('http:', 'https:') + '@300w_400h.webp',
-            // 获取进度：例如 "看到第5话"
+            // 实时进度，例如 "看到第12话"
             progress: item.new_ep?.index_show || '已订阅',
             rating: item.rating?.score || 0,
             evaluate: item.evaluate || item.brief || "暂无简介",
