@@ -47,7 +47,7 @@ export default function TrackingPage() {
                 })
 
                 const rawAnime: any[] = [], rawMovies: any[] = [], rawShows: any[] = []
-                const itemsToProcess = Array.from(uniqueMap.values()).slice(0, 60)
+                const itemsToProcess = Array.from(uniqueMap.values()).slice(0, 200)
 
                 await Promise.all(itemsToProcess.map(async (item: any) => {
                     const info = item.show || item.movie || item
