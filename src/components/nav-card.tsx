@@ -61,7 +61,7 @@ const list = [
 	{
 		icon: BilibiliOutlineSVG,
 		iconActive: BilibiliFilledSVG,      
-		label: '追番记录',
+		label: '影视记录',
 		href: '/anime'
 	}
 
