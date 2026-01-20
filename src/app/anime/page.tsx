@@ -63,7 +63,7 @@ export default function TrackingPage() {
                             title: tmdbData.name || tmdbData.title || info.title,
                             cover: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : '',
                             rating: tmdbData.vote_average?.toFixed(1) || '0.0',
-                            progress: isMovie ? '电影' : `已看 ${item.plays || '?'} 次 / 共 ${tmdbData.number_of_episodes || '?'} 集`,
+                            progress: isMovie ? '电影' : `已看 ${item.plays || '?'} 集 / 共 ${tmdbData.number_of_episodes || '?'} 集`,
                             evaluate: tmdbData.overview || '暂无内容介绍。',
                             link: `https://trakt.tv/${isMovie ? 'movies' : 'shows'}/${info.ids?.slug || tmdbId}`
                         }
