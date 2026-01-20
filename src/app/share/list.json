@@ -70,5 +70,15 @@
 			"图片"
 		],
 		"stars": 3
+	},
+	{
+		"name": "次元城动画",
+		"logo": "https://www.cycani.org/upload/site/20240319-1/25e700991446a527804c82a744731b60.png",
+		"url": "https://www.cycani.org/",
+		"description": "一款免费的番剧网站，推荐下载PC客户端，手机广告较多",
+		"tags": [
+			"影视"
+		],
+		"stars": 4
 	}
 ]
