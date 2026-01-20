@@ -57,8 +57,7 @@ const list = [
 		href: '/bloggers'
 	},
 	{
-		icon: ShareOutlineSVG,       
-		iconActive: ShareFilledSVG, 
+		icon: "bilibili",        
 		label: '追番记录',
 		href: '/anime'
 	}
