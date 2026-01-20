@@ -42,3 +42,36 @@ export const svgItems: { key: string; Component: SvgComponent }[] = [
 	{ key: './website-filled.svg', Component: Svg16 },
 	{ key: './website-outline.svg', Component: Svg17 }
 ]
+
+// 将以下代码粘贴到该文件的最下方
+
+/**
+ * B站图标 - 线框版（未选中状态）
+ */
+export function BilibiliOutline(props: React.SVGProps<SVGSVGElement>) {
+  // 注意这里添加了 fill="currentColor"，让图标颜色跟随文字
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="4" y="6" width="16" height="12" rx="2" />
+      <path d="M8 2v4" />
+      <path d="M16 2v4" />
+      <path d="M9 14c1.5.5 3 .5 4.5 0" />
+      <path d="M9 10h.01" />
+      <path d="M15 10h.01" />
+    </svg>
+  )
+}
+
+/**
+ * B站图标 - 填充版（选中状态）
+ */
+export function BilibiliFilled(props: React.SVGProps<SVGSVGElement>) {
+  // 注意这里是填充模式，stroke="none" 且 fill="currentColor"
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" {...props}>
+      <path d="M18 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zM8 2v4h2V2H8zm6 0v4h2V2h-2zM9 14c1.5.5 3 .5 4.5 0" />
+      <circle cx="9" cy="10" r="1.5" fill="white" />
+      <circle cx="15" cy="10" r="1.5" fill="white" />
+    </svg>
+  )
+}
