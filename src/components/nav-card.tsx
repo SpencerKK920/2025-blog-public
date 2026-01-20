@@ -23,6 +23,8 @@ import { cn } from '@/lib/utils'
 import { useSize } from '@/hooks/use-size'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { HomeDraggableLayer } from '@/app/(home)/home-draggable-layer'
+import BilibiliOutlineSVG from '@/svgs/bilibili-outline.svg'
+import BilibiliFilledSVG from '@/svgs/bilibili-filled.svg'
 
 
 const list = [
@@ -57,7 +59,8 @@ const list = [
 		href: '/bloggers'
 	},
 	{
-		icon: "bilibili",        
+		icon: BilibiliOutline,
+		iconActive: BilibiliFilled,      
 		label: '追番记录',
 		href: '/anime'
 	}
