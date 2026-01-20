@@ -45,6 +45,11 @@ export const svgItems: { key: string; Component: SvgComponent }[] = [
 
 
 
+// =================== 重新复制这段干净的代码 ===================
+
+/**
+ * B站图标 - 线框版（未选中状态）
+ */
 export function BilibiliOutline(props: React.SVGProps<SVGSVGElement>) {
   // 注意这里添加了 fill="currentColor"，让图标颜色跟随文字
   return (
@@ -59,7 +64,9 @@ export function BilibiliOutline(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
-
+/**
+ * B站图标 - 填充版（选中状态）
+ */
 export function BilibiliFilled(props: React.SVGProps<SVGSVGElement>) {
   // 注意这里是填充模式，stroke="none" 且 fill="currentColor"
   return (
