@@ -3,13 +3,12 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 
-// 已更新为你提供的最新 Key [cite: 2026-01-20]
+// 使用你提供的配置信息 [cite: 2026-01-20]
 const TRAKT_CLIENT_ID = '23a43b1011bc7e1490da9aa9ada0eea7b028135a65f668cac7885ac9b0ec0b65'
 const TMDB_API_KEY = 'c06994e9e33158fdac8dfda5befad851'
 const TRAKT_USERNAME = 'SpencerKK'
 
 export default function TrackingPage() {
-    // 按分类管理状态 [cite: 2026-01-20]
     const [categories, setCategories] = useState<{
         anime: any[],
         movies: any[],
@@ -18,59 +17,86 @@ export default function TrackingPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const fetchTraktData = async () => {
+        const fetchExhaustiveData = async () => {
             try {
-                // 抓取较多记录以确保分类后数量充足 [cite: 2026-01-20]
-                const historyRes = await fetch(`https://api.trakt.tv/users/${TRAKT_USERNAME}/history?limit=100`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'trakt-api-version': '2',
-                        'trakt-api-key': TRAKT_CLIENT_ID
+                /**
+                 * 核心改变：从 history 切换到 watched [cite: 2026-01-20]
+                 * watched 接口对每部剧集只返回一个对象，不会被重复集数淹没
+                 */
+                const [watchedShowsRes, watchedMoviesRes, watchlistRes] = await Promise.all([
+                    fetch(`https://api.trakt.tv/users/${TRAKT_USERNAME}/watched/shows`, {
+                        headers: { 'Content-Type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': TRAKT_CLIENT_ID }
+                    }),
+                    fetch(`https://api.trakt.tv/users/${TRAKT_USERNAME}/watched/movies`, {
+                        headers: { 'Content-Type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': TRAKT_CLIENT_ID }
+                    }),
+                    fetch(`https://api.trakt.tv/users/${TRAKT_USERNAME}/watchlist`, {
+                        headers: { 'Content-Type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': TRAKT_CLIENT_ID }
+                    })
+                ])
+
+                const watchedShows = await watchedShowsRes.json()
+                const watchedMovies = await watchedMoviesRes.json()
+                const watchlist = await watchlistRes.json()
+
+                // 合并所有来源 [cite: 2026-01-20]
+                const combined = [
+                    ...watchedShows,
+                    ...watchedMovies,
+                    ...(Array.isArray(watchlist) ? watchlist : [])
+                ]
+
+                // 使用 Map 进行终极去重 (基于 TMDB ID) [cite: 2026-01-20]
+                const uniqueMap = new Map()
+                combined.forEach(item => {
+                    const info = item.show || item.movie || item
+                    const tmdbId = info.ids?.tmdb
+                    if (tmdbId && !uniqueMap.has(tmdbId)) {
+                        uniqueMap.set(tmdbId, item)
                     }
                 })
-                const history = await historyRes.json()
 
-                // 去重并分类
-                const seenIds = new Set()
                 const rawAnime: any[] = []
                 const rawMovies: any[] = []
                 const rawShows: any[] = []
 
-                for (const item of history) {
-                    const tmdbId = item.type === 'movie' ? item.movie.ids.tmdb : item.show.ids.tmdb
-                    if (seenIds.has(tmdbId)) continue
-                    seenIds.add(tmdbId)
+                // 并行获取 TMDB 数据并分类 [cite: 2026-01-20]
+                const itemsToProcess = Array.from(uniqueMap.values()).slice(0, 60)
+                await Promise.all(itemsToProcess.map(async (item: any) => {
+                    const info = item.show || item.movie || item
+                    const isMovie = !!item.movie || item.type === 'movie'
+                    const tmdbId = info.ids?.tmdb
+                    
+                    try {
+                        const tmdbRes = await fetch(`https://api.themoviedb.org/3/${isMovie ? 'movie' : 'tv'}/${tmdbId}?api_key=${TMDB_API_KEY}&language=zh-CN`)
+                        const tmdbData = await tmdbRes.json()
 
-                    // 抓取详细数据以进行智能分类 [cite: 2026-01-20]
-                    const type = item.type === 'movie' ? 'movie' : 'tv'
-                    const tmdbRes = await fetch(`https://api.themoviedb.org/3/${type}/${tmdbId}?api_key=${TMDB_API_KEY}&language=zh-CN`)
-                    const tmdbData = await tmdbRes.json()
+                        const processedItem = {
+                            id: tmdbId,
+                            title: tmdbData.name || tmdbData.title || info.title,
+                            cover: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : '',
+                            rating: tmdbData.vote_average?.toFixed(1) || '0.0',
+                            progress: isMovie ? '电影' : `已看 ${item.plays || '?'} 次 / 共 ${tmdbData.number_of_episodes || '?'} 集`,
+                            evaluate: tmdbData.overview || '暂无内容介绍。',
+                            link: `https://trakt.tv/${isMovie ? 'movies' : 'shows'}/${info.ids?.slug || tmdbId}`
+                        }
 
-                    const processedItem = {
-                        id: item.id,
-                        title: item.movie?.title || item.show?.title,
-                        cover: `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}`,
-                        rating: tmdbData.vote_average?.toFixed(1) || '0.0',
-                        progress: item.type === 'movie' ? '电影' : `更新至 ${tmdbData.number_of_episodes} 集`,
-                        evaluate: tmdbData.overview || '暂无内容介绍。',
-                        link: item.type === 'movie' ? `https://trakt.tv/movies/${item.movie.ids.slug}` : `https://trakt.tv/shows/${item.show.ids.slug}`
+                        // 动漫识别逻辑：日本产 或 日语原声 [cite: 2026-01-20]
+                        const isAnime = tmdbData.original_language === 'ja' || 
+                                        tmdbData.origin_country?.includes('JP') || 
+                                        tmdbData.genres?.some((g: any) => g.id === 16)
+
+                        if (isAnime) {
+                            rawAnime.push(processedItem)
+                        } else if (isMovie) {
+                            rawMovies.push(processedItem)
+                        } else {
+                            rawShows.push(processedItem)
+                        }
+                    } catch (e) {
+                        console.error("TMDB Error", e)
                     }
-
-                    // 智能分类逻辑 [cite: 2026-01-20]
-                    const isAnime = tmdbData.genres?.some((g: any) => g.id === 16) && 
-                                    (tmdbData.origin_country?.includes('JP') || tmdbData.original_language === 'ja')
-
-                    if (isAnime) {
-                        rawAnime.push(processedItem)
-                    } else if (item.type === 'movie') {
-                        rawMovies.push(processedItem)
-                    } else {
-                        rawShows.push(processedItem)
-                    }
-
-                    // 每个分类最多显示 10 个 [cite: 2026-01-20]
-                    if (rawAnime.length >= 10 && rawMovies.length >= 10 && rawShows.length >= 10) break
-                }
+                }))
 
                 setCategories({ anime: rawAnime, movies: rawMovies, shows: rawShows })
                 setLoading(false)
@@ -80,7 +106,7 @@ export default function TrackingPage() {
             }
         }
 
-        fetchTraktData()
+        fetchExhaustiveData()
     }, [])
 
     const renderCard = (item: any, index: number) => (
@@ -94,7 +120,11 @@ export default function TrackingPage() {
             className='bg-card squircle group relative flex flex-col overflow-hidden border shadow-sm transition-all hover:shadow-xl'
         >
             <div className='relative aspect-[3/4.2] overflow-hidden bg-zinc-100'>
-                <img src={item.cover} alt={item.title} loading="lazy" className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-110' />
+                {item.cover ? (
+                    <img src={item.cover} alt={item.title} className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-110' />
+                ) : (
+                    <div className="flex h-full items-center justify-center text-[10px] text-zinc-400">NO POSTER</div>
+                )}
                 {item.rating > 0 && (
                     <div className='absolute top-2 right-2 rounded-md bg-black/60 px-2 py-1 text-[10px] text-yellow-400 backdrop-blur-md font-bold z-10'>
                         ★ {item.rating}
@@ -133,16 +163,16 @@ export default function TrackingPage() {
     return (
         <div className='flex flex-col items-center px-6 pt-32 pb-12'>
             <div className='mb-12 text-center'>
-                <h1 className='font-averia text-4xl font-bold tracking-tight uppercase'>Archive</h1>
+                <h1 className='font-averia text-4xl font-bold tracking-tight uppercase tracking-widest'>Library</h1>
                 <div className='bg-brand mt-2 h-1 w-12 mx-auto rounded-full' />
             </div>
 
             {loading ? (
-                <div className='text-brand animate-pulse text-sm'>正在同步 Trakt 云端数据并分类...</div>
+                <div className='text-brand animate-pulse text-sm font-medium'>正在检索全量影视库...</div>
             ) : (
-                <div className="w-full max-w-[1200px] space-y-20">
-                    {renderSection("Anime", "日本动画", categories.anime)}
-                    {renderSection("TV Shows", "欧美/国产剧集", categories.shows)}
+                <div className="w-full max-w-[1200px] space-y-24">
+                    {renderSection("Anime", "番剧收藏 & 归档", categories.anime)}
+                    {renderSection("TV Shows", "剧集归档", categories.shows)}
                     {renderSection("Movies", "电影归档", categories.movies)}
                 </div>
             )}
