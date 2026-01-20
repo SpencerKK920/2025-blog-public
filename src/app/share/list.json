@@ -80,5 +80,76 @@
 			"影视"
 		],
 		"stars": 4
+	},
+	{
+		"name": "iLOVEPDF",
+		"logo": "https://www.ilovepdf.com/img/favicons-pdf/favicon-32x32.png",
+		"url": "https://www.ilovepdf.com/zh-cn",
+		"description": "PDF转换工具",
+		"tags": [
+			"PDF",
+			"工具"
+		],
+		"stars": 4
+	},
+	{
+		"name": "KMS激活",
+		"logo": "blob:https://blog.2131245.xyz/8cd49dcf-90d3-43c4-95f1-c49536cb0c97",
+		"url": "http://www.yishimei.cn/network/319.html",
+		"description": "提供windows office及微软各系列软件激活",
+		"tags": [
+			"Windows"
+		],
+		"stars": 4
+	},
+	{
+		"name": "News",
+		"logo": "https://newsnow.busiyi.world/icon.svg",
+		"url": "https://newsnow.busiyi.world/",
+		"description": "NewsNow - 实时新闻聚合阅读器，汇集全球热点新闻，提供优雅的阅读体验",
+		"tags": [
+			"新闻"
+		],
+		"stars": 5
+	},
+	{
+		"name": "小叽资源",
+		"logo": "blob:https://blog.2131245.xyz/62ce4315-f3c7-4f0a-b10b-74817967d632",
+		"url": "https://steamzg.com/",
+		"description": "提供各种游戏学习版资源",
+		"tags": [
+			"游戏"
+		],
+		"stars": 5
+	},
+	{
+		"name": "Z-library",
+		"logo": "https://zh.zlib.li/favicon.svg",
+		"url": "https://zh.zlib.li/#desktop_app_tab",
+		"description": "世界上最大的电子图书馆",
+		"tags": [
+			"书籍"
+		],
+		"stars": 5
+	},
+	{
+		"name": "幻梦轻小说",
+		"logo": "blob:https://blog.2131245.xyz/fd9e3598-eb8a-4897-8621-3f8d386cf908",
+		"url": "https://www.huanmengacg.com/",
+		"description": "各种轻小说资源",
+		"tags": [
+			"书籍"
+		],
+		"stars": 5
+	},
+	{
+		"name": "wallhaven",
+		"logo": "https://wallhaven.cc/favicon.ico",
+		"url": "https://wallhaven.cc/",
+		"description": "各种精美高分辨率壁纸",
+		"tags": [
+			"壁纸"
+		],
+		"stars": 5
 	}
 ]
