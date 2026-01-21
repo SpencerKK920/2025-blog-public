@@ -25,9 +25,17 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { HomeDraggableLayer } from '@/app/(home)/home-draggable-layer'
 import BilibiliOutlineSVG from '@/svgs/bilibili-outline.svg'
 import BilibiliFilledSVG from '@/svgs/bilibili-filled.svg'
+import TraktOutlineSVG from '@/svgs/trakt-outline.svg'
+import TraktFilledSVG from '@/svgs/trakt-filled.svg'
 
 
 const list = [
+	{
+        icon: TraktOutlineSVG,
+        iconActive: TraktFilledSVG,
+        label: '影视',
+        href: '/board'
+    },
 	{
 		icon: ScrollOutlineSVG,
 		iconActive: ScrollFilledSVG,
