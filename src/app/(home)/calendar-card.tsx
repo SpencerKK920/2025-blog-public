@@ -1,74 +1,56 @@
-import Card from '@/components/card'
-import { useCenterStore } from '@/hooks/use-center'
-import { useConfigStore } from './stores/config-store'
-import { CARD_SPACING } from '@/consts'
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
-import { cn } from '@/lib/utils'
-import { HomeDraggableLayer } from './home-draggable-layer'
+'use client'
 
-dayjs.locale('zh-cn')
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation' // 1. 引入路由工具
+import { motion } from 'motion/react'
+import { Calendar as CalendarIcon, ArrowUpRight } from 'lucide-react'
 
 export default function CalendarCard() {
-	const center = useCenterStore()
-	const { cardStyles, siteContent } = useConfigStore()
-	const now = dayjs()
-	const currentDate = now.date()
-	const firstDayOfMonth = now.startOf('month')
-	const firstDayWeekday = (firstDayOfMonth.day() + 6) % 7
-	const daysInMonth = now.daysInMonth()
-	const currentWeekday = (now.day() + 6) % 7
-	const styles = cardStyles.calendarCard
-	const hiCardStyles = cardStyles.hiCard
-	const clockCardStyles = cardStyles.clockCard
+    const router = useRouter() // 2. 初始化路由
+    const [date, setDate] = useState<Date | null>(null)
 
-	const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x + CARD_SPACING + hiCardStyles.width / 2
-	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y - clockCardStyles.offset + CARD_SPACING
+    useEffect(() => {
+        setDate(new Date())
+    }, [])
 
-	return (
-		<HomeDraggableLayer cardKey='calendarCard' x={x} y={y} width={styles.width} height={styles.height}>
-			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className='flex flex-col'>
-				{siteContent.enableChristmas && (
-					<>
-						<img
-							src='/images/christmas/snow-7.webp'
-							alt='Christmas decoration'
-							className='pointer-events-none absolute'
-							style={{ width: 150, right: -12, top: -12, opacity: 0.8 }}
-						/>
-					</>
-				)}
+    if (!date) return (
+        <div className="card aspect-square p-6 flex items-center justify-center bg-zinc-100 animate-pulse rounded-3xl" />
+    )
 
-				<h3 className='text-secondary text-sm'>
-					{now.format('YYYY/M/D')} {now.format('ddd')}
-				</h3>
-				<ul className={cn('text-secondary mt-3 grid h-[206px] flex-1 grid-cols-7 gap-2 text-sm', (styles.height < 240 || styles.width < 240) && 'text-xs')}>
-					{new Array(7).fill(0).map((_, index) => {
-						const isCurrentWeekday = index === currentWeekday
-						return (
-							<li key={index} className={cn('flex items-center justify-center font-medium', isCurrentWeekday && 'text-brand')}>
-								{dates[index]}
-							</li>
-						)
-					})}
+    const dayName = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][date.getDay()]
+    const monthName = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][date.getMonth()]
 
-					{new Array(firstDayWeekday).fill(0).map((_, index) => (
-						<li key={`empty-${index}`} />
-					))}
+    return (
+        <motion.div 
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.push('/schedule')} // 3. 直接在 div 上添加点击事件
+            className="group relative h-full w-full overflow-hidden rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all cursor-pointer" // 4. 确保加上 cursor-pointer (鼠标变手型)
+        >
+            {/* --- 内部代码完全保持原样，没有任何结构变化 --- */}
+            
+            <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity text-primary">
+                <ArrowUpRight className="w-6 h-6" />
+            </div>
 
-					{new Array(daysInMonth).fill(0).map((_, index) => {
-						const day = index + 1
-						const isToday = day === currentDate
-						return (
-							<li key={day} className={cn('flex items-center justify-center rounded-lg', isToday && 'bg-linear border font-medium')}>
-								{day}
-							</li>
-						)
-					})}
-				</ul>
-			</Card>
-		</HomeDraggableLayer>
-	)
+            <div className="flex items-center gap-2">
+                <div className="p-2 bg-red-500/10 rounded-xl text-red-500">
+                    <CalendarIcon className="w-6 h-6" />
+                </div>
+                <span className="text-xs font-bold tracking-widest text-secondary group-hover:text-primary transition-colors">SCHEDULE</span>
+            </div>
+
+            <div className="flex flex-col items-center justify-center flex-1 py-4">
+                <span className="text-xs font-bold text-red-500 tracking-[0.2em] mb-2">{dayName}</span>
+                <span className="text-7xl font-bold tracking-tighter text-zinc-900 dark:text-zinc-100 group-hover:scale-110 transition-transform duration-300">
+                    {date.getDate()}
+                </span>
+                <span className="text-lg font-medium text-zinc-400 mt-2">{monthName} {date.getFullYear()}</span>
+            </div>
+
+            <div className="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <div className="h-full bg-primary w-[30%] group-hover:w-full transition-all duration-500 ease-out" />
+            </div>
+        </motion.div>
+    )
 }
-
-const dates = ['一', '二', '三', '四', '五', '六', '日']
