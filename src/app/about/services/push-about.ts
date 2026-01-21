@@ -1,6 +1,12 @@
 import { useAuthStore } from '@/hooks/use-auth'
-import { getOctokit } from '@/lib/github-client'
-import { GITHUB_CONFIG } from '@/consts' // 修改这里：导入 GITHUB_CONFIG
+import { 
+    signAppJwt, 
+    getInstallationId, 
+    createInstallationToken, 
+    putFile,
+    toBase64Utf8 
+} from '@/lib/github-client'
+import { GITHUB_CONFIG } from '@/consts'
 import { toast } from 'sonner'
 
 export interface AboutData {
@@ -21,49 +27,41 @@ export const pushAbout = async (data: AboutData) => {
 		throw new Error('请先输入 Private Key')
 	}
 
-	const octokit = getOctokit(privateKey)
-
 	try {
-        // 1. 获取当前文件的 SHA (为了更新必须提供 SHA)
-		let sha = data.sha
-		if (!sha) {
-			try {
-				const { data: currentFile } = await octokit.rest.repos.getContent({
-					owner: GITHUB_CONFIG.OWNER, // 修改这里
-					repo: GITHUB_CONFIG.REPO,   // 修改这里
-					path: FILE_PATH,
-					ref: GITHUB_CONFIG.BRANCH,  // 修改这里
-				})
-				if (!Array.isArray(currentFile)) {
-					sha = currentFile.sha
-				}
-			} catch (e) {
-				// 如果文件不存在，sha 保持 undefined，直接新建
-				console.warn('File not found, creating new one.')
-			}
-		}
+        // 1. 身份认证流程：使用 Private Key 生成 JWT
+        const jwt = signAppJwt(GITHUB_CONFIG.APP_ID, privateKey)
+        
+        // 2. 获取 Installation ID (连接 App 和 仓库)
+        const installationId = await getInstallationId(jwt, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO)
+        
+        // 3. 生成 Access Token
+        const token = await createInstallationToken(jwt, installationId)
 
-        // 2. 推送更新
-		const contentEncoded = Buffer.from(JSON.stringify({
+        // 4. 准备文件内容
+		const contentJson = JSON.stringify({
             title: data.title,
             description: data.description,
             content: data.content,
             techStack: data.techStack,
             changelog: data.changelog
-        }, null, 2)).toString('base64')
+        }, null, 2)
+        
+        // 使用工具函数转换为 Base64 (支持 UTF-8)
+        const contentEncoded = toBase64Utf8(contentJson)
 
-		await octokit.rest.repos.createOrUpdateFileContents({
-			owner: GITHUB_CONFIG.OWNER, // 修改这里
-			repo: GITHUB_CONFIG.REPO,   // 修改这里
-			path: FILE_PATH,
-			message: 'chore: update about page content',
-			content: contentEncoded,
-			branch: GITHUB_CONFIG.BRANCH, // 修改这里
-			sha: sha,
-		})
+        // 5. 推送文件 (putFile 内部会自动处理 SHA 校验和更新)
+		await putFile(
+            token, 
+            GITHUB_CONFIG.OWNER, 
+            GITHUB_CONFIG.REPO, 
+            FILE_PATH, 
+            contentEncoded, 
+            'chore: update about page content', 
+            GITHUB_CONFIG.BRANCH
+        )
 
 		toast.success('更新成功！')
-	} catch (error) {
+	} catch (error: any) {
 		console.error('Push failed:', error)
 		throw error
 	}
