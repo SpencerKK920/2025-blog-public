@@ -2,6 +2,6 @@
   "title": "关于本站",
   "description": "基于 Next.js 的全栈个人知识库",
   "content": "👋 **你好，我是 Spencer**\n\n这是一个完全开源的、基于 GitHub 文件系统的现代化博客。\n这里不仅记录了我的技术折腾笔记，也包含了我对生活的观察。\n\n网站采用 **纯静态架构**，没有传统数据库，所有数据（文章、配置、图片）都托管在 GitHub 仓库中。",
-  "techStack": "- **前端框架**: Next.js 14, React, TailwindCSS\n- **动画交互**: Framer Motion\n- **数据存储**: GitHub API (Git as Database)\n- **部署托管**: Vercel / Cloudflare Pages\n- **开发工具**: VS Code, TypeScript",
+  "techStack": "Next.js\nFramer\nGitHub API\nVercel\nTypeScript",
   "changelog": "2026-01-21 文章看板功能，支持拖拽排序\n\n\n2026-01-18 移动端导航栏遮挡问题\n\n2025-12-25 新增圣诞节下雪特效\n"
 }
