@@ -17,15 +17,14 @@ export function BlogBillboard({ post }: { post: BlogIndexItem }) {
                 href={`/blog/${post.id}`} 
                 className="flex flex-col md:flex-row overflow-hidden squircle bg-card border shadow-sm hover:shadow-2xl transition-all duration-500"
             >
-                {/* 左侧：文章封面 (使用你项目特有的路径格式) */}
+                {/* 左侧：文章封面 */}
                 <div className="relative w-full h-64 md:h-[500px] md:w-7/12 overflow-hidden shrink-0">
                     <img
                         src={`/blogs/${post.id}/${post.cover}`}
                         alt={post.title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    {/* 渐变遮罩 */}
-                    <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/40 via-transparent to-transparent opacity-60" />
                 </div>
 
                 {/* 右侧：文章信息 */}
@@ -45,7 +44,7 @@ export function BlogBillboard({ post }: { post: BlogIndexItem }) {
                     </div>
 
                     <p className="text-sm md:text-base text-secondary/80 leading-relaxed line-clamp-4 mb-10">
-                        {post.description || "点击进入阅读这篇关于影视追踪系统或开发的深度解析文章..."}
+                        {post.description || "点击进入阅读这篇精选文章的详细内容..."}
                     </p>
 
                     <div className="text-sm font-bold text-brand flex items-center gap-2 group/btn">
