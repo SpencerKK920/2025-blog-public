@@ -2,20 +2,14 @@
 
 import { useBlogIndex } from '@/hooks/use-blog-index'
 import { motion } from 'motion/react'
-import { BlogBillboard } from './blog-billboard'
+import { BoardCard } from './board-card' // 我们稍后创建这个更精致的卡片组件
 
 export default function BoardPage() {
-    // 关键修正：Hook 返回的是 items 而不是 blogIndex
     const { items, loading } = useBlogIndex()
-
-    // 自动识别：优先找标题包含“开发”或“博客”的文章，否则取第一篇
-    const featuredPost = items && items.length > 0 
-        ? items.find(p => p.title.includes('开发') || p.title.includes('博客')) || items[0] 
-        : null
 
     return (
         <div className="flex flex-col items-center px-6 pt-32 pb-12 min-h-screen">
-            <div className='mb-16 text-center'>
+            <div className='mb-12 text-center'>
                 <h1 className='font-averia text-4xl font-bold tracking-tight uppercase tracking-widest italic'>
                     Studio Board
                 </h1>
@@ -24,17 +18,18 @@ export default function BoardPage() {
 
             {loading ? (
                 <div className="flex flex-col items-center gap-4 mt-20">
-                    <div className="w-10 h-10 border-2 border-brand/30 border-t-brand animate-spin rounded-full" />
-                    <p className="text-xs font-mono text-brand uppercase tracking-widest">Loading Article...</p>
+                    <div className="w-8 h-8 border-2 border-brand/30 border-t-brand animate-spin rounded-full" />
+                    <p className="text-[10px] font-mono text-brand uppercase tracking-widest">Loading Library...</p>
                 </div>
             ) : (
-                <div className="w-full max-w-[1200px]">
-                    {featuredPost ? (
-                        <BlogBillboard post={featuredPost} />
+                /* 修正：这里使用 map 循环渲染所有文章，解决“只显示一个”的问题 */
+                <div className="w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {items && items.length > 0 ? (
+                        items.map((post, index) => (
+                            <BoardCard key={post.slug} post={post} index={index} />
+                        ))
                     ) : (
-                        <div className="text-center p-20 border border-dashed rounded-3xl opacity-20 italic">
-                            No articles found in blog index.
-                        </div>
+                        <div className="col-span-full text-center py-20 opacity-20 italic">No articles indexed.</div>
                     )}
                 </div>
             )}
