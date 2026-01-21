@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'motion/react'
 import Link from 'next/link'
 import { 
     ChevronLeft, ChevronRight, CheckCircle2, Circle, Plus, Trash2, 
-    ArrowLeft, Calendar as CalendarIcon, Edit3, Save, X, ListTodo
+    ArrowLeft, Calendar as CalendarIcon, Edit3, Save, X, ListTodo,
+    Clock
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -14,13 +15,12 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { pushTasks } from './services/push-tasks'
 import initialData from './tasks.json'
 
-// 类型定义
+// --- 类型定义 ---
 type Task = {
     id: string
     text: string
     completed: boolean
 }
-
 type TaskMap = Record<string, Task[]>
 
 export default function SchedulePage() {
@@ -40,7 +40,7 @@ export default function SchedulePage() {
     const { siteContent } = useConfigStore()
     const hideEditButton = siteContent.hideEditButton ?? false
 
-    // --- 日历核心逻辑 ---
+    // --- 日历逻辑 ---
     const getDaysInMonth = (date: Date) => {
         const year = date.getFullYear()
         const month = date.getMonth()
@@ -58,24 +58,20 @@ export default function SchedulePage() {
     const dateKey = selectedDate.toISOString().split('T')[0]
     const currentTasks = tasks[dateKey] || []
 
-    // --- 权限与保存逻辑 ---
+    // --- 交互处理 ---
     const handleChoosePrivateKey = async (file: File) => {
         try {
             const text = await file.text()
             setPrivateKey(text)
             toast.success('密钥读取成功')
         } catch (error) {
-            console.error('Failed to read private key:', error)
             toast.error('读取密钥文件失败')
         }
     }
 
     const handleSaveClick = () => {
-        if (!isAuth) {
-            keyInputRef.current?.click()
-        } else {
-            handleSave()
-        }
+        if (!isAuth) keyInputRef.current?.click()
+        else handleSave()
     }
 
     const handleSave = async () => {
@@ -102,16 +98,8 @@ export default function SchedulePage() {
         if (!isEditMode) return toast.warning('请先进入编辑模式')
         if (!newTask.trim()) return
 
-        const task: Task = {
-            id: crypto.randomUUID(),
-            text: newTask.trim(),
-            completed: false
-        }
-
-        setTasks(prev => ({
-            ...prev,
-            [dateKey]: [...(prev[dateKey] || []), task]
-        }))
+        const task: Task = { id: crypto.randomUUID(), text: newTask.trim(), completed: false }
+        setTasks(prev => ({ ...prev, [dateKey]: [...(prev[dateKey] || []), task] }))
         setNewTask('')
     }
 
@@ -119,9 +107,7 @@ export default function SchedulePage() {
         if (!isEditMode) return
         setTasks(prev => ({
             ...prev,
-            [dateKey]: prev[dateKey].map(t => 
-                t.id === taskId ? { ...t, completed: !t.completed } : t
-            )
+            [dateKey]: prev[dateKey].map(t => t.id === taskId ? { ...t, completed: !t.completed } : t)
         }))
     }
 
@@ -150,8 +136,6 @@ export default function SchedulePage() {
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [isEditMode])
 
-    const buttonText = isAuth ? '保存更新' : '导入密钥'
-
     const getDayStatus = (day: number) => {
         const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
         const key = checkDate.toISOString().split('T')[0]
@@ -164,69 +148,69 @@ export default function SchedulePage() {
 
     return (
         <>
-            <input
-                ref={keyInputRef}
-                type='file'
-                accept='.pem'
-                className='hidden'
-                onChange={async e => {
-                    const f = e.target.files?.[0]
-                    if (f) await handleChoosePrivateKey(f)
-                    if (e.currentTarget) e.currentTarget.value = ''
-                }}
-            />
+            <input ref={keyInputRef} type='file' accept='.pem' className='hidden' onChange={async e => {
+                const f = e.target.files?.[0]
+                if (f) await handleChoosePrivateKey(f)
+                if (e.currentTarget) e.currentTarget.value = ''
+            }} />
 
-            {/* 顶部导航栏 */}
-            <div className='fixed top-6 left-6 z-20'>
-                 <Link href="/" className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md shadow-sm hover:shadow-md transition-all text-secondary hover:text-primary border border-white/20">
-                    <ArrowLeft className="w-4 h-4" />
-                    <span className="font-medium text-sm">返回首页</span>
-                </Link>
-            </div>
+            {/* 全局容器：使用透明背景，依赖全局 Layout 的背景图 */}
+            <div className="min-h-screen w-full p-6 md:p-12 pt-28 flex justify-center items-start">
+                
+                {/* 顶部返回按钮 */}
+                <div className='fixed top-6 left-6 z-20'>
+                     <Link href="/" className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 dark:bg-black/40 backdrop-blur-md shadow-sm border border-white/20 hover:scale-105 transition-all text-secondary hover:text-primary">
+                        <ArrowLeft className="w-4 h-4" />
+                        <span className="font-medium text-sm">返回首页</span>
+                    </Link>
+                </div>
 
-            <div className="min-h-screen bg-[#F2F1ED] dark:bg-zinc-950 text-foreground p-4 md:p-8 pt-24 flex justify-center items-start">
-                <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                {/* 核心布局：Grid 确保高度一致 */}
+                <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[700px]">
                     
-                    {/* 左侧：日历大方块 (占8列) */}
-                    <div className="lg:col-span-8 flex flex-col h-full">
+                    {/* === 左侧：日历卡片 (占8列) === */}
+                    <div className="lg:col-span-8 h-full">
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className={`flex-1 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border border-white/50 dark:border-zinc-800 p-8 rounded-3xl shadow-sm transition-all ${isEditMode ? 'ring-2 ring-primary/20' : ''}`}
+                            className={`h-full flex flex-col bg-white/50 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl p-8 shadow-sm transition-all ${isEditMode ? 'ring-2 ring-primary/20' : ''}`}
                         >
-                            {/* 标题栏 */}
+                            {/* 日历头部 */}
                             <div className="flex items-center justify-between mb-8">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-red-500/10 rounded-xl text-red-500">
-                                        <CalendarIcon className="w-6 h-6" />
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/60 dark:bg-white/10 rounded-2xl shadow-sm text-primary">
+                                        <CalendarIcon className="w-7 h-7" />
                                     </div>
-                                    <h2 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">
-                                        {currentDate.getFullYear()}年 
-                                        <span className="ml-2">{currentDate.getMonth() + 1}月</span>
-                                    </h2>
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-zinc-800 dark:text-zinc-100 font-mono tracking-tight">
+                                            {currentDate.getFullYear()}
+                                        </h2>
+                                        <p className="text-zinc-500 font-medium text-lg ml-0.5">
+                                            {currentDate.getMonth() + 1}月
+                                        </p>
+                                    </div>
                                 </div>
-                                
                                 <div className="flex gap-2">
-                                    <button onClick={() => changeMonth(-1)} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-xl border border-zinc-100 dark:border-zinc-700 shadow-sm transition-all text-secondary">
-                                        <ChevronLeft className="w-5 h-5" />
+                                    <button onClick={() => changeMonth(-1)} className="p-3 hover:bg-white/50 dark:hover:bg-white/10 rounded-2xl transition-all text-zinc-600 dark:text-zinc-400">
+                                        <ChevronLeft className="w-6 h-6" />
                                     </button>
-                                    <button onClick={() => changeMonth(1)} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-xl border border-zinc-100 dark:border-zinc-700 shadow-sm transition-all text-secondary">
-                                        <ChevronRight className="w-5 h-5" />
+                                    <button onClick={() => changeMonth(1)} className="p-3 hover:bg-white/50 dark:hover:bg-white/10 rounded-2xl transition-all text-zinc-600 dark:text-zinc-400">
+                                        <ChevronRight className="w-6 h-6" />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* 星期头 */}
+                            {/* 星期表头 */}
                             <div className="grid grid-cols-7 mb-4">
                                 {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(d => (
-                                    <div key={d} className="text-center text-xs font-bold tracking-wider text-zinc-400 py-3">{d}</div>
+                                    <div key={d} className="text-center text-xs font-bold text-zinc-400 py-2 tracking-wider">{d}</div>
                                 ))}
                             </div>
 
-                            {/* 日期网格 */}
-                            <div className="grid grid-cols-7 gap-3 h-full content-start">
+                            {/* 日期网格 - flex-1 确保填满剩余高度 */}
+                            <div className="grid grid-cols-7 gap-4 flex-1 content-start">
                                 {daysArray.map((day, i) => {
-                                    if (!day) return <div key={i} className="aspect-square" /> // 占位
+                                    if (!day) return <div key={i} />
                                     const isSelected = day === selectedDate.getDate() && currentDate.getMonth() === selectedDate.getMonth()
                                     const isToday = day === new Date().getDate() && currentDate.getMonth() === new Date().getMonth() && currentDate.getFullYear() === new Date().getFullYear()
                                     const status = getDayStatus(day)
@@ -237,21 +221,17 @@ export default function SchedulePage() {
                                             whileTap={{ scale: 0.9 }}
                                             onClick={() => setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))}
                                             className={`
-                                                aspect-square rounded-2xl flex flex-col items-center justify-center relative transition-all duration-300
+                                                relative aspect-square rounded-2xl flex flex-col items-center justify-center text-lg transition-all duration-200
                                                 ${isSelected 
-                                                    ? 'bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-lg scale-105 z-10' 
-                                                    : 'hover:bg-white dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}
-                                                ${isToday && !isSelected ? 'text-red-500 font-bold bg-red-50 dark:bg-red-900/10' : ''}
+                                                    ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105 font-bold' 
+                                                    : 'hover:bg-white/60 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-300'}
+                                                ${isToday && !isSelected ? 'text-primary font-bold bg-primary/5' : ''}
                                             `}
                                         >
-                                            <span className={`text-lg ${isSelected ? 'font-bold' : 'font-medium'}`}>{day}</span>
-                                            
-                                            {/* 状态点 */}
+                                            {day}
                                             {status.has && (
-                                                <div className={`absolute bottom-3 w-1.5 h-1.5 rounded-full ${
-                                                    status.allDone 
-                                                        ? 'bg-green-500' 
-                                                        : (isSelected ? 'bg-white/50 dark:bg-black/50' : 'bg-red-500')
+                                                <div className={`absolute bottom-2 w-1.5 h-1.5 rounded-full ${
+                                                    status.allDone ? 'bg-green-500' : (isSelected ? 'bg-white' : 'bg-primary')
                                                 }`} />
                                             )}
                                         </motion.button>
@@ -261,54 +241,55 @@ export default function SchedulePage() {
                         </motion.div>
                     </div>
 
-                    {/* 右侧：任务长框 (占4列，高度自动填满) */}
-                    <div className="lg:col-span-4 flex flex-col h-full">
+                    {/* === 右侧：任务长条 (占4列) === */}
+                    <div className="lg:col-span-4 h-full">
                         <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 }}
-                            className={`flex flex-col h-full min-h-[500px] bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border border-white/50 dark:border-zinc-800 rounded-3xl shadow-sm overflow-hidden ${isEditMode ? 'ring-2 ring-primary/20' : ''}`}
+                            className={`h-full flex flex-col bg-white/50 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm ${isEditMode ? 'ring-2 ring-primary/20' : ''}`}
                         >
-                            {/* 任务头 */}
-                            <div className="p-8 pb-4">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-500">
+                            {/* 任务头部 */}
+                            <div className="p-8 pb-4 flex-none">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="p-2.5 bg-orange-500/10 rounded-xl text-orange-500">
                                         <ListTodo className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-100">
-                                        {selectedDate.getMonth() + 1}月{selectedDate.getDate()}日
-                                    </h3>
+                                    <span className="text-xs font-mono text-zinc-400 bg-white/50 dark:bg-black/20 px-2 py-1 rounded-md">
+                                        {selectedDate.toISOString().split('T')[0]}
+                                    </span>
                                 </div>
-                                <div className="pl-12 text-sm text-zinc-400 font-medium">
-                                    {isEditMode ? '正在编辑中...' : `${currentTasks.length} 个待办事项`}
-                                </div>
+                                <h3 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">
+                                    待办事项
+                                </h3>
+                                <p className="text-sm text-zinc-500 mt-1">
+                                    {currentTasks.length > 0 ? `这里有 ${currentTasks.length} 个任务等你完成` : '今天暂无安排'}
+                                </p>
                             </div>
-                            
-                            <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-700 to-transparent my-2" />
 
-                            {/* 列表区域 */}
+                            {/* 装饰分割线 */}
+                            <div className="w-full h-px bg-gradient-to-r from-transparent via-white/50 dark:via-zinc-700 to-transparent flex-none" />
+
+                            {/* 任务列表 (自适应高度，带滚动) */}
                             <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
-                                <AnimatePresence initial={false} mode='popLayout'>
+                                <AnimatePresence mode='popLayout'>
                                     {currentTasks.length === 0 ? (
-                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full flex flex-col items-center justify-center text-zinc-300 dark:text-zinc-600 gap-4">
-                                            <div className="w-20 h-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center">
-                                                <CheckCircle2 className="w-10 h-10 opacity-50" />
-                                            </div>
-                                            <p className="text-sm font-medium">今日无安排，享受生活吧</p>
+                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full flex flex-col items-center justify-center text-zinc-400 gap-4 opacity-60">
+                                            <Clock className="w-12 h-12 stroke-[1.5]" />
+                                            <p className="text-sm">享受自由时光</p>
                                         </motion.div>
                                     ) : (
-                                        currentTasks.map((task, idx) => (
+                                        currentTasks.map(task => (
                                             <motion.div
                                                 layout
-                                                initial={{ opacity: 0, x: -20 }}
+                                                initial={{ opacity: 0, x: 20 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, scale: 0.9 }}
-                                                transition={{ delay: idx * 0.05 }}
                                                 key={task.id}
-                                                className={`group relative flex items-center gap-3 p-4 rounded-2xl border transition-all duration-300 ${
+                                                className={`group flex items-center gap-3 p-4 rounded-2xl border transition-all ${
                                                     task.completed 
-                                                        ? 'bg-zinc-50/50 dark:bg-zinc-800/30 border-transparent opacity-60' 
-                                                        : 'bg-white dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 shadow-sm hover:shadow-md'
+                                                        ? 'bg-zinc-100/50 dark:bg-zinc-800/30 border-transparent opacity-60 grayscale' 
+                                                        : 'bg-white/80 dark:bg-zinc-800/80 border-white/50 dark:border-zinc-700 shadow-sm hover:shadow-md'
                                                 }`}
                                             >
                                                 <button 
@@ -321,13 +302,11 @@ export default function SchedulePage() {
                                                         : <Circle className="w-6 h-6 text-zinc-300 hover:text-primary transition-colors" />
                                                     }
                                                 </button>
-                                                
-                                                <span className={`flex-1 text-sm font-medium leading-relaxed ${task.completed ? 'line-through text-zinc-400' : 'text-zinc-700 dark:text-zinc-200'}`}>
+                                                <span className={`flex-1 text-sm font-medium ${task.completed ? 'line-through decoration-zinc-400' : 'text-zinc-700 dark:text-zinc-200'}`}>
                                                     {task.text}
                                                 </span>
-
                                                 {isEditMode && (
-                                                    <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 absolute right-2 p-2 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all">
+                                                    <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 )}
@@ -337,20 +316,19 @@ export default function SchedulePage() {
                                 </AnimatePresence>
                             </div>
 
-                            {/* 编辑输入框 (固定在底部) */}
+                            {/* 底部输入框 (仅编辑模式) */}
                             {isEditMode && (
-                                <div className="p-4 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border-t border-zinc-100 dark:border-zinc-800">
-                                    <form onSubmit={handleAddTask} className="relative group">
+                                <div className="p-4 bg-white/40 dark:bg-black/20 backdrop-blur-md flex-none border-t border-white/20">
+                                    <form onSubmit={handleAddTask} className="relative">
                                         <input
                                             type="text"
                                             value={newTask}
                                             onChange={(e) => setNewTask(e.target.value)}
-                                            placeholder="输入任务，按回车添加..."
-                                            autoFocus
-                                            className="w-full bg-zinc-100 dark:bg-zinc-800 border-transparent focus:border-primary/30 rounded-2xl py-3.5 pl-5 pr-12 text-sm focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                                            placeholder="添加新任务..."
+                                            className="w-full bg-white/80 dark:bg-zinc-800/80 border-none rounded-2xl py-3 pl-4 pr-12 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none shadow-sm"
                                         />
-                                        <button type="submit" disabled={!newTask.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-primary text-white rounded-xl disabled:opacity-50 disabled:bg-zinc-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/30 transition-all">
-                                            <Plus className="w-5 h-5" />
+                                        <button type="submit" disabled={!newTask.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-primary text-white rounded-xl disabled:opacity-50 hover:scale-105 transition-all shadow-lg shadow-primary/20">
+                                            <Plus className="w-4 h-4" />
                                         </button>
                                     </form>
                                 </div>
@@ -360,38 +338,22 @@ export default function SchedulePage() {
                 </div>
             </div>
 
-            {/* 右上角控制按钮 */}
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className='fixed top-6 right-6 z-20 flex gap-3 max-sm:hidden'>
+            {/* 右上角操作按钮 */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='fixed top-6 right-6 z-20 flex gap-3 max-sm:hidden'>
                 {isEditMode ? (
                     <>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={handleCancel}
-                            disabled={isSaving}
-                            className='flex items-center gap-2 rounded-full border border-white/20 bg-white/80 dark:bg-zinc-800/80 px-5 py-2.5 text-sm font-medium shadow-sm backdrop-blur hover:bg-white transition-all text-zinc-600 dark:text-zinc-300'>
+                        <button onClick={handleCancel} disabled={isSaving} className='flex items-center gap-2 rounded-full bg-white/70 dark:bg-black/40 px-5 py-2.5 text-sm font-medium backdrop-blur-md hover:bg-white shadow-sm transition-all border border-white/20 text-zinc-600'>
                             <X className="w-4 h-4" /> 取消
-                        </motion.button>
-                        <motion.button 
-                            whileHover={{ scale: 1.05 }} 
-                            whileTap={{ scale: 0.95 }} 
-                            onClick={handleSaveClick} 
-                            disabled={isSaving} 
-                            className='brand-btn px-6 py-2.5 rounded-full flex items-center gap-2 shadow-lg shadow-primary/20 font-medium'
-                        >
-                            <Save className="w-4 h-4" />
-                            {isSaving ? '正在保存...' : buttonText}
-                        </motion.button>
+                        </button>
+                        <button onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6 py-2.5 rounded-full flex items-center gap-2 shadow-lg shadow-primary/20'>
+                            <Save className="w-4 h-4" /> {isSaving ? '保存中...' : (isAuth ? '保存更新' : '导入密钥')}
+                        </button>
                     </>
                 ) : (
                     !hideEditButton && (
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setIsEditMode(true)}
-                            className='flex items-center gap-2 rounded-full border border-white/20 bg-white/60 dark:bg-zinc-800/60 px-5 py-2.5 text-sm font-medium backdrop-blur-md transition-all hover:bg-white hover:shadow-md text-zinc-600 dark:text-zinc-300'>
+                        <button onClick={() => setIsEditMode(true)} className='flex items-center gap-2 rounded-full bg-white/70 dark:bg-black/40 px-5 py-2.5 text-sm font-medium backdrop-blur-md hover:bg-white shadow-sm transition-all border border-white/20 text-zinc-600'>
                             <Edit3 className="w-4 h-4" /> 编辑日程
-                        </motion.button>
+                        </button>
                     )
                 )}
             </motion.div>
