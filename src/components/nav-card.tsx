@@ -31,12 +31,6 @@ import TraktFilledSVG from '@/svgs/trakt-filled.svg'
 
 const list = [
 	{
-        icon: TraktOutlineSVG,
-        iconActive: TraktFilledSVG,
-        label: '文章看板',
-        href: '/board'
-    },
-	{
 		icon: ScrollOutlineSVG,
 		iconActive: ScrollFilledSVG,
 		label: '近期文章',
@@ -71,8 +65,13 @@ const list = [
 		iconActive: BilibiliFilledSVG,      
 		label: '影视记录',
 		href: '/anime'
-	}
-
+	},
+   {
+        icon: TraktOutlineSVG,
+        iconActive: TraktFilledSVG,
+        label: '文章看板',
+        href: '/board'
+    }
 ]
 
 const extraSize = 8
