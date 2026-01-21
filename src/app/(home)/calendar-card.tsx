@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation' // 1. 引入路由
+import { useRouter } from 'next/navigation'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
@@ -13,7 +13,7 @@ import { HomeDraggableLayer } from './home-draggable-layer'
 dayjs.locale('zh-cn')
 
 export default function CalendarCard() {
-    const router = useRouter() // 2. 初始化路由
+    const router = useRouter()
     const center = useCenterStore()
     const { cardStyles, siteContent } = useConfigStore()
     const now = dayjs()
@@ -29,56 +29,65 @@ export default function CalendarCard() {
     const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x + CARD_SPACING + hiCardStyles.width / 2
     const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y - clockCardStyles.offset + CARD_SPACING
 
+    // 处理跳转逻辑
+    const handleClick = (e: React.MouseEvent) => {
+        // 阻止事件冒泡，防止触发拖拽
+        e.stopPropagation() 
+        router.push('/schedule')
+    }
+
     return (
         <HomeDraggableLayer cardKey='calendarCard' x={x} y={y} width={styles.width} height={styles.height}>
-            <Card 
-                order={styles.order} 
-                width={styles.width} 
-                height={styles.height} 
-                x={x} 
-                y={y} 
-                // 3. 添加点击事件和手型光标
-                onClick={() => router.push('/schedule')}
-                className='flex flex-col cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all'
-            >
-                {siteContent.enableChristmas && (
-                    <>
-                        <img
-                            src='/images/christmas/snow-7.webp'
-                            alt='Christmas decoration'
-                            className='pointer-events-none absolute'
-                            style={{ width: 150, right: -12, top: -12, opacity: 0.8 }}
-                        />
-                    </>
-                )}
+            <Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className='flex flex-col'>
+                {/* 关键修改：
+                    在 Card 内部包裹一个 div，把 onClick 加在这里。
+                    w-full h-full 确保填满整个卡片区域。
+                    cursor-pointer 确保显示手型。
+                */}
+                <div 
+                    onClick={handleClick}
+                    className="w-full h-full flex flex-col cursor-pointer"
+                    title="点击查看日程"
+                >
+                    {siteContent.enableChristmas && (
+                        <>
+                            <img
+                                src='/images/christmas/snow-7.webp'
+                                alt='Christmas decoration'
+                                className='pointer-events-none absolute'
+                                style={{ width: 150, right: -12, top: -12, opacity: 0.8 }}
+                            />
+                        </>
+                    )}
 
-                <h3 className='text-secondary text-sm'>
-                    {now.format('YYYY/M/D')} {now.format('ddd')}
-                </h3>
-                <ul className={cn('text-secondary mt-3 grid h-[206px] flex-1 grid-cols-7 gap-2 text-sm', (styles.height < 240 || styles.width < 240) && 'text-xs')}>
-                    {new Array(7).fill(0).map((_, index) => {
-                        const isCurrentWeekday = index === currentWeekday
-                        return (
-                            <li key={index} className={cn('flex items-center justify-center font-medium', isCurrentWeekday && 'text-brand')}>
-                                {dates[index]}
-                            </li>
-                        )
-                    })}
+                    <h3 className='text-secondary text-sm'>
+                        {now.format('YYYY/M/D')} {now.format('ddd')}
+                    </h3>
+                    <ul className={cn('text-secondary mt-3 grid h-[206px] flex-1 grid-cols-7 gap-2 text-sm', (styles.height < 240 || styles.width < 240) && 'text-xs')}>
+                        {new Array(7).fill(0).map((_, index) => {
+                            const isCurrentWeekday = index === currentWeekday
+                            return (
+                                <li key={index} className={cn('flex items-center justify-center font-medium', isCurrentWeekday && 'text-brand')}>
+                                    {dates[index]}
+                                </li>
+                            )
+                        })}
 
-                    {new Array(firstDayWeekday).fill(0).map((_, index) => (
-                        <li key={`empty-${index}`} />
-                    ))}
+                        {new Array(firstDayWeekday).fill(0).map((_, index) => (
+                            <li key={`empty-${index}`} />
+                        ))}
 
-                    {new Array(daysInMonth).fill(0).map((_, index) => {
-                        const day = index + 1
-                        const isToday = day === currentDate
-                        return (
-                            <li key={day} className={cn('flex items-center justify-center rounded-lg', isToday && 'bg-linear border font-medium')}>
-                                {day}
-                            </li>
-                        )
-                    })}
-                </ul>
+                        {new Array(daysInMonth).fill(0).map((_, index) => {
+                            const day = index + 1
+                            const isToday = day === currentDate
+                            return (
+                                <li key={day} className={cn('flex items-center justify-center rounded-lg', isToday && 'bg-linear border font-medium')}>
+                                    {day}
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </div>
             </Card>
         </HomeDraggableLayer>
     )
