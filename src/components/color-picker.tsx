@@ -9,7 +9,13 @@ import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import LikeButton from '@/components/like-button'
 import GithubSVG from '@/svgs/github.svg'
-import initialData from './list.json'
+
+'use client'
+export function ColorPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="h-8 w-8 rounded cursor-pointer" />
+  )
+}
 
 interface ExtendedData extends AboutData {
 	techStack?: { name: string; icon: string; desc: string }[]
