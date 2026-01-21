@@ -9,7 +9,7 @@ import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import LikeButton from '@/components/like-button'
 
-// === 1. 图标库引入 (只保留稳定版本) ===
+// === 1. 图标库引入 ===
 import { 
     User, Cpu, History, Edit3, Eye, Save, X 
 } from 'lucide-react' 
@@ -18,15 +18,17 @@ import {
     FaLinux, FaReact, FaDocker, FaGitAlt, FaNodeJs, FaPython, FaJava, FaUbuntu, FaRust, FaPhp, FaAws, FaFigma, FaAndroid, FaApple
 } from 'react-icons/fa'
 
+// 移除报错的 SiVisualstudiocode
 import { 
     SiNextdotjs, SiTypescript, SiTailwindcss, SiNginx, SiRedis, SiMongodb, SiMysql, 
     SiPostgresql, SiVercel, SiCloudflare, SiJavascript, SiHtml5, SiCss3, SiKubernetes,
     SiVuedotjs, SiGo, SiSvelte, SiAngular, SiKotlin,
     SiSupabase, SiFirebase, SiPrisma, SiExpress, SiVite, 
-    SiFlutter, SiGithub, SiNotion, SiPostman, SiIntellijidea, SiVisualstudiocode
+    SiFlutter, SiGithub, SiNotion, SiPostman, SiIntellijidea
 } from 'react-icons/si'
 
-import { VscTerminalLinux } from "react-icons/vsc"
+// 引入 VS Code 官方图标 (VscVscode)
+import { VscTerminalLinux, VscVscode } from "react-icons/vsc"
 import GithubSVG from '@/svgs/github.svg'
 import initialData from './list.json'
 
@@ -86,7 +88,7 @@ const ALL_ICONS: TechIconDef[] = [
     { id: 'github', label: 'GitHub', icon: SiGithub, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800', category: 'ops' },
     
     // --- 工具 ---
-    { id: 'vscode', label: 'VS Code', icon: SiVisualstudiocode, color: 'text-blue-500', bg: 'bg-blue-500/10', category: 'tool' },
+    { id: 'vscode', label: 'VS Code', icon: VscVscode, color: 'text-blue-500', bg: 'bg-blue-500/10', category: 'tool' }, // 使用 VscVscode
     { id: 'idea', label: 'IntelliJ', icon: SiIntellijidea, color: 'text-pink-500', bg: 'bg-pink-500/10', category: 'tool' },
     { id: 'figma', label: 'Figma', icon: FaFigma, color: 'text-purple-500', bg: 'bg-purple-500/10', category: 'tool' },
     { id: 'notion', label: 'Notion', icon: SiNotion, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800', category: 'tool' },
@@ -383,25 +385,4 @@ export default function Page() {
 					<div className='mt-12 flex flex-col items-center justify-center gap-6'>
 						<motion.a href='https://github.com/spencerkk920' target='_blank' rel='noreferrer' initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ scale: 1.1 }} className='bg-card flex h-[50px] w-[50px] items-center justify-center rounded-full border shadow-sm text-secondary hover:text-primary transition-colors'>
 							<GithubSVG className="w-6 h-6" />
-						</motion.a>
-						<LikeButton slug='about-page' delay={0.3} />
-					</div>
-				</div>
-			</div>
-
-			<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className='fixed top-4 right-6 z-20 flex gap-3 max-sm:hidden'>
-				{isEditMode ? (
-					<>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleCancel} disabled={isSaving} className='flex items-center gap-2 rounded-xl border bg-white/80 px-4 py-2 text-sm shadow-sm backdrop-blur dark:bg-zinc-800/80 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors'><X className="w-4 h-4" /> 取消</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setIsPreviewMode(prev => !prev)} disabled={isSaving} className={`flex items-center gap-2 rounded-xl border bg-white/80 px-4 py-2 text-sm shadow-sm backdrop-blur dark:bg-zinc-800/80`}>{isPreviewMode ? <><Edit3 className="w-4 h-4"/> 继续编辑</> : <><Eye className="w-4 h-4"/> 预览效果</>}</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6 flex items-center gap-2 shadow-md'><Save className="w-4 h-4" />{isSaving ? '保存中...' : buttonText}</motion.button>
-					</>
-				) : (
-					!hideEditButton && (
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleEnterEditMode} className='flex items-center gap-2 rounded-xl border bg-white/60 px-4 py-2 text-sm backdrop-blur-md transition-colors hover:bg-white/90 shadow-sm dark:bg-zinc-800/60'><Edit3 className="w-4 h-4" /> 编辑页面</motion.button>
-					)
-				)}
-			</motion.div>
-		</>
-	)
-}
+						</motion
