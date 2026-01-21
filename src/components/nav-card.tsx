@@ -33,7 +33,7 @@ const list = [
 	{
         icon: TraktOutlineSVG,
         iconActive: TraktFilledSVG,
-        label: '影视',
+        label: '文章看板',
         href: '/board'
     },
 	{
