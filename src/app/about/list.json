@@ -1,5 +1,14 @@
 {
 	"title": "关于本站",
 	"description": "一个基于 Github 的现代化博客系统",
-	"content": "📦网站基于 Github 仓库完全存储，利用YYsuni的开源模板进行的二次开发\n\n🚀无后端，无 serverless function，纯静态站点\n\n✏️文章通过可视化 UI 直接编辑并提交到 Github 仓库\n\n🔑所有用户都可以编辑，提交需要 Owner 的 Private Key\n\n## 技术栈\n\n- Next.js\n- React\n- TypeScript\n- Tailwind CSS\n- Motion\n- Github API"
+	"content": "这里写你的个人介绍和网页介绍，支持 Markdown 语法。\n\n🚀 无后端，无 serverless function，纯静态站点。",
+	"techStack": [
+		{ "name": "Next.js", "desc": "核心开发框架", "icon": "⚡" },
+		{ "name": "TypeScript", "desc": "类型安全语言", "icon": "📘" },
+		{ "name": "Tailwind", "desc": "原子化 CSS 框架", "icon": "🎨" }
+	],
+	"updates": [
+		{ "date": "2026-01-21", "event": "更新文章看板功能" },
+		{ "date": "2026-01-20", "event": "重构关于页面布局" }
+	]
 }
