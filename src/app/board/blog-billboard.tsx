@@ -4,49 +4,46 @@ import { motion } from 'motion/react'
 import Link from 'next/link'
 import { BlogIndexItem } from '@/hooks/use-blog-index'
 
-export function BlogBillboard({ post }: { post: BlogIndexItem }) {
-    if (!post) return null
-
+export function BoardCard({ post, index }: { post: BlogIndexItem; index: number }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
             className="w-full group"
         >
             <Link 
-                href={`/blog/${post.slug}`} // 修正：使用 slug
-                className="flex flex-col md:flex-row overflow-hidden squircle bg-card border shadow-sm hover:shadow-2xl transition-all duration-500"
+                href={`/blog/${post.slug}`} // 修正：链接到详情页
+                className="flex flex-col sm:flex-row h-full overflow-hidden squircle bg-card border shadow-sm hover:shadow-xl transition-all duration-300"
             >
-                {/* 封面图：直接使用 post.cover，因为它已包含完整路径 */}
-                <div className="relative w-full h-64 md:h-[480px] md:w-7/12 overflow-hidden shrink-0 bg-secondary/5">
+                {/* 左侧封面：高度大幅度缩减 */}
+                <div className="relative w-full sm:w-2/5 h-48 sm:h-auto overflow-hidden shrink-0 bg-secondary/5">
                     <img
-                        src={post.cover}
+                        src={post.cover} // 修正：直接使用 index.json 里的 cover 路径
                         alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/20 to-transparent opacity-60" />
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center p-10 md:p-14">
-                    <div className="mb-6">
-                        <span className="px-3 py-1 text-[10px] font-bold tracking-widest uppercase bg-brand text-white rounded-full">
-                            {post.category || 'Featured'} 
+                {/* 右侧内容 */}
+                <div className="flex-1 flex flex-col p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                        <span className="px-2 py-0.5 text-[9px] font-bold tracking-tighter uppercase bg-brand/10 text-brand rounded">
+                            {post.category || 'Post'}
                         </span>
+                        <span className="text-[10px] text-secondary font-mono opacity-50">{post.date.split('T')[0]}</span>
                     </div>
 
-                    <h2 className="text-4xl md:text-5xl font-bold mb-6 font-averia italic group-hover:text-brand transition-colors leading-tight">
+                    <h2 className="text-xl font-bold mb-3 font-averia group-hover:text-brand transition-colors line-clamp-2">
                         {post.title}
                     </h2>
 
-                    <p className="text-sm md:text-base text-secondary/80 leading-relaxed line-clamp-4 mb-10">
-                        {post.summary || "点击进入阅读这篇精选文章的详细内容..."}
+                    <p className="text-xs text-secondary/70 leading-relaxed line-clamp-2 mb-4">
+                        {post.summary || "点击阅读全文..."}
                     </p>
 
-                    <div className="text-sm font-bold text-brand flex items-center gap-2">
-                        CONTINUE READING
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
+                    <div className="mt-auto text-[10px] font-bold text-brand flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        VIEW DETAILS →
                     </div>
                 </div>
             </Link>
