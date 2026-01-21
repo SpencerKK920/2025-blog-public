@@ -8,7 +8,7 @@ import { pushAbout, type AboutData } from './services/push-about'
 import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import LikeButton from '@/components/like-button'
-import { User, Cpu, History, Edit3, Eye, Save, X } from 'lucide-react' // 使用 lucide 图标
+import { User, Cpu, History, Edit3, Eye, Save, X } from 'lucide-react' // 引入图标
 
 import GithubSVG from '@/svgs/github.svg'
 import initialData from './list.json'
@@ -135,7 +135,7 @@ export default function Page() {
 			<div className='flex flex-col items-center justify-center px-4 pt-24 pb-12 w-full'>
 				<div className='w-full max-w-[1200px] space-y-8'>
 					
-					{/* 顶部标题区域 (仅在预览/查看模式显示大标题，编辑模式显示输入框) */}
+					{/* 顶部标题区域 */}
 					{isEditMode && !isPreviewMode ? (
 						<div className="space-y-4 max-w-2xl mx-auto">
 							<input
@@ -204,7 +204,6 @@ export default function Page() {
 											onChange={e => setData({ ...data, techStack: e.target.value })}
 										/>
 									) : (
-										// 可以在这里给 li 加上特殊的样式，或者直接用 markdown
 										<div className="prose prose-sm dark:prose-invert max-w-none prose-li:marker:text-primary">
 											{techContent}
 										</div>
@@ -218,4 +217,6 @@ export default function Page() {
 							initial={{ opacity: 0, x: 20 }} 
 							animate={{ opacity: 1, x: 0 }} 
 							transition={{ delay: 0.2 }}
-							className="lg:col-span-1 h-full min-h-
+							className="lg:col-span-1 h-full min-h-[400px]"
+						>
+							<CardBox title
