@@ -33,13 +33,13 @@ const list = [
 	   {
         icon: TraktOutlineSVG,
         iconActive: TraktFilledSVG,
-        label: '首页',
+        label: '文章看板',
         href: '/board'
     },
 	{
 		icon: ScrollOutlineSVG,
 		iconActive: ScrollFilledSVG,
-		label: '近期文章',
+		label: '文章列表',
 		href: '/blog'
 	},
 	{
