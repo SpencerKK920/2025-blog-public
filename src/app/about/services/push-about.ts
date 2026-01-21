@@ -1,45 +1,70 @@
-import { toBase64Utf8, getRef, createTree, createCommit, updateRef, createBlob, type TreeItem } from '@/lib/github-client'
-import { getAuthToken } from '@/lib/auth'
-import { GITHUB_CONFIG } from '@/consts'
+import { useAuthStore } from '@/hooks/use-auth'
+import { getOctokit } from '@/lib/github-client'
+import { GITHUB_OWNER, GITHUB_REPO, GITHUB_BRANCH } from '@/consts'
 import { toast } from 'sonner'
 
-export type AboutData = {
+export interface AboutData {
 	title: string
 	description: string
-	content: string
+	content: string       // 对应：个人介绍/网页介绍 (左上)
+	techStack: string     // 对应：技术栈 (左下)
+	changelog: string     // 对应：更新日志 (右侧)
+    sha?: string
 }
 
-export async function pushAbout(data: AboutData): Promise<void> {
-	const token = await getAuthToken()
+const FILE_PATH = 'src/app/about/list.json'
 
-	toast.info('正在获取分支信息...')
-	const refData = await getRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`)
-	const latestCommitSha = refData.sha
+export const pushAbout = async (data: AboutData) => {
+	const { privateKey } = useAuthStore.getState()
 
-	const commitMessage = `更新关于页面`
+	if (!privateKey) {
+		throw new Error('请先输入 Private Key')
+	}
 
-	toast.info('正在准备文件...')
+	const octokit = getOctokit(privateKey)
 
-	const treeItems: TreeItem[] = []
+	try {
+        // 1. 获取当前文件的 SHA (为了更新必须提供 SHA)
+		let sha = data.sha
+		if (!sha) {
+			try {
+				const { data: currentFile } = await octokit.rest.repos.getContent({
+					owner: GITHUB_OWNER,
+					repo: GITHUB_REPO,
+					path: FILE_PATH,
+					ref: GITHUB_BRANCH,
+				})
+				if (!Array.isArray(currentFile)) {
+					sha = currentFile.sha
+				}
+			} catch (e) {
+				// 如果文件不存在，sha 保持 undefined，直接新建
+				console.warn('File not found, creating new one.')
+			}
+		}
 
-	const aboutJson = JSON.stringify(data, null, '\t')
-	const aboutBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(aboutJson), 'base64')
-	treeItems.push({
-		path: 'src/app/about/list.json',
-		mode: '100644',
-		type: 'blob',
-		sha: aboutBlob.sha
-	})
+        // 2. 推送更新
+		const contentEncoded = Buffer.from(JSON.stringify({
+            title: data.title,
+            description: data.description,
+            content: data.content,
+            techStack: data.techStack,
+            changelog: data.changelog
+        }, null, 2)).toString('base64')
 
-	toast.info('正在创建文件树...')
-	const treeData = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, latestCommitSha)
+		await octokit.rest.repos.createOrUpdateFileContents({
+			owner: GITHUB_OWNER,
+			repo: GITHUB_REPO,
+			path: FILE_PATH,
+			message: 'chore: update about page content',
+			content: contentEncoded,
+			branch: GITHUB_BRANCH,
+			sha: sha,
+		})
 
-	toast.info('正在创建提交...')
-	const commitData = await createCommit(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, commitMessage, treeData.sha, [latestCommitSha])
-
-	toast.info('正在更新分支...')
-	await updateRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`, commitData.sha)
-
-	toast.success('发布成功！')
+		toast.success('更新成功！')
+	} catch (error) {
+		console.error('Push failed:', error)
+		throw error
+	}
 }
-
