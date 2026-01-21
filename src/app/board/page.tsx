@@ -11,7 +11,7 @@ export default function BoardPage() {
         <div className="flex flex-col items-center px-6 pt-32 pb-12 min-h-screen">
             <div className='mb-12 text-center'>
                 <h1 className='font-averia text-4xl font-bold tracking-tight uppercase tracking-widest italic'>
-                    首页
+                    文章看板
                 </h1>
                 <div className='bg-brand mt-2 h-1 w-12 mx-auto rounded-full' />
             </div>
