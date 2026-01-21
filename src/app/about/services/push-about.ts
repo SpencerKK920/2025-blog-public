@@ -1,14 +1,14 @@
 import { useAuthStore } from '@/hooks/use-auth'
 import { getOctokit } from '@/lib/github-client'
-import { GITHUB_OWNER, GITHUB_REPO, GITHUB_BRANCH } from '@/consts'
+import { GITHUB_CONFIG } from '@/consts' // 修改这里：导入 GITHUB_CONFIG
 import { toast } from 'sonner'
 
 export interface AboutData {
 	title: string
 	description: string
-	content: string       // 对应：个人介绍/网页介绍 (左上)
-	techStack: string     // 对应：技术栈 (左下)
-	changelog: string     // 对应：更新日志 (右侧)
+	content: string
+	techStack: string
+	changelog: string
     sha?: string
 }
 
@@ -29,10 +29,10 @@ export const pushAbout = async (data: AboutData) => {
 		if (!sha) {
 			try {
 				const { data: currentFile } = await octokit.rest.repos.getContent({
-					owner: GITHUB_OWNER,
-					repo: GITHUB_REPO,
+					owner: GITHUB_CONFIG.OWNER, // 修改这里
+					repo: GITHUB_CONFIG.REPO,   // 修改这里
 					path: FILE_PATH,
-					ref: GITHUB_BRANCH,
+					ref: GITHUB_CONFIG.BRANCH,  // 修改这里
 				})
 				if (!Array.isArray(currentFile)) {
 					sha = currentFile.sha
@@ -53,12 +53,12 @@ export const pushAbout = async (data: AboutData) => {
         }, null, 2)).toString('base64')
 
 		await octokit.rest.repos.createOrUpdateFileContents({
-			owner: GITHUB_OWNER,
-			repo: GITHUB_REPO,
+			owner: GITHUB_CONFIG.OWNER, // 修改这里
+			repo: GITHUB_CONFIG.REPO,   // 修改这里
 			path: FILE_PATH,
 			message: 'chore: update about page content',
 			content: contentEncoded,
-			branch: GITHUB_BRANCH,
+			branch: GITHUB_CONFIG.BRANCH, // 修改这里
 			sha: sha,
 		})
 
