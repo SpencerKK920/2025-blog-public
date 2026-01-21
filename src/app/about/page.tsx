@@ -10,7 +10,6 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import LikeButton from '@/components/like-button'
 import GithubSVG from '@/svgs/github.svg'
 import initialData from './list.json'
-import { cn } from '@/lib/utils'
 
 export default function Page() {
 	const [data, setData] = useState<AboutData>(initialData as AboutData)
@@ -52,7 +51,7 @@ export default function Page() {
 	const handleSave = async () => {
 		setIsSaving(true)
 		try {
-			await pushAbout(data)
+			await pushAbout(data) // 调用提交服务
 			setOriginalData(data)
 			setIsEditMode(false)
 			setIsPreviewMode(false)
@@ -101,6 +100,7 @@ export default function Page() {
 			<div className='flex flex-col items-center px-6 pt-32 pb-24 max-sm:px-4'>
 				<div className='w-full max-w-[1000px]'>
 					
+					{/* 标题部分 */}
 					<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className='mb-16 text-center'>
 						{isEditMode && !isPreviewMode ? (
 							<div className='flex flex-col gap-4'>
@@ -134,58 +134,56 @@ export default function Page() {
 							/>
 						</div>
 					) : (
-						<div className='grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr'>
+						/* 标准网格布局，解决重叠问题 */
+						<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
 							
+							{/* 格子 1: 主要介绍内容 */}
 							<motion.div 
 								initial={{ opacity: 0, x: -20 }} 
 								animate={{ opacity: 1, x: 0 }} 
-								className='md:col-span-2 card p-8 md:p-12 relative overflow-hidden flex flex-col'
+								className='md:col-span-2 card p-8 md:p-12 bg-white/50 backdrop-blur-sm'
 							>
-								<div className='absolute -top-4 -right-4 p-4 opacity-[0.03] font-averia text-9xl italic pointer-events-none'>Vision</div>
-								<div className='prose prose-sm max-w-none relative z-10 flex-1'>
-									{loading ? '渲染中...' : content}
+								<div className='prose prose-sm max-w-none'>
+									{loading ? '加载中...' : content}
 								</div>
 							</motion.div>
 
+							{/* 格子 2: 站点状态面板 */}
 							<motion.div 
 								initial={{ opacity: 0, x: 20 }} 
 								animate={{ opacity: 1, x: 0 }} 
 								transition={{ delay: 0.1 }}
-								className='bg-brand/5 border border-brand/10 squircle p-8 flex flex-col justify-between'
+								className='bg-brand/5 border border-brand/10 rounded-[32px] p-8 flex flex-col'
 							>
-								<div>
-									<h3 className='text-brand text-[10px] font-bold uppercase tracking-[0.2em] mb-8'>Site Status</h3>
-									<div className='space-y-6'>
-										{[
-											{ label: 'Platform', value: 'Github Static' },
-											{ label: 'Framework', value: 'Next.js 15' },
-											{ label: 'UI Engine', value: 'Motion + Tailwind' }
-										].map(item => (
-											<div key={item.label} className='flex justify-between items-end border-b border-brand/10 pb-2'>
-												<span className='text-secondary text-[10px] uppercase opacity-60'>{item.label}</span>
-												<span className='font-mono text-xs font-bold'>{item.value}</span>
-											</div>
-										))}
-									</div>
+								<h3 className='text-brand text-[10px] font-bold uppercase tracking-widest mb-8'>Site Status</h3>
+								<div className='space-y-6 flex-1'>
+									{[
+										{ label: 'Platform', value: 'Github Static' },
+										{ label: 'Framework', value: 'Next.js 15' },
+										{ label: 'UI Engine', value: 'Motion + Tailwind' }
+									].map(item => (
+										<div key={item.label} className='flex justify-between items-end border-b border-brand/10 pb-2'>
+											<span className='text-secondary text-[10px] uppercase opacity-60'>{item.label}</span>
+											<span className='font-mono text-xs font-bold'>{item.value}</span>
+										</div>
+									))}
 								</div>
-								<div className='mt-12 text-[10px] text-brand/40 font-mono italic'>
+								<div className='mt-8 text-[10px] text-brand/40 font-mono italic'>
 									Studio Version: 2026.1
 								</div>
 							</motion.div>
 
+							{/* 格子 3: 技术栈 (占满整行) */}
 							<motion.div 
 								initial={{ opacity: 0, y: 20 }} 
 								animate={{ opacity: 1, y: 0 }} 
 								transition={{ delay: 0.2 }}
-								className='md:col-span-3 card p-8 group'
+								className='md:col-span-3 card p-8'
 							>
-								<div className='flex items-center justify-between mb-6'>
-									<h3 className='font-averia text-xl italic opacity-70 group-hover:text-brand transition-colors'>Tech Integrated</h3>
-									<div className='h-px flex-1 bg-border mx-6 opacity-20' />
-								</div>
+								<h3 className='font-averia text-xl italic opacity-70 mb-6'>Tech Integrated</h3>
 								<div className='flex flex-wrap gap-3'>
 									{['Next.js', 'React', 'TypeScript', 'Tailwind', 'Motion', 'Github API', 'Vercel', 'Sonner'].map(tech => (
-										<span key={tech} className='px-4 py-2 bg-secondary/5 border rounded-full text-[11px] font-mono hover:border-brand/40 hover:text-brand transition-all cursor-default'>
+										<span key={tech} className='px-4 py-2 bg-secondary/5 border rounded-full text-[11px] font-mono hover:border-brand/40 transition-all'>
 											{tech}
 										</span>
 									))}
@@ -194,13 +192,14 @@ export default function Page() {
 						</div>
 					)}
 
+					{/* 底部按钮 */}
 					<div className='mt-16 flex items-center justify-center gap-8'>
 						<motion.a
 							href='https://github.com/YYsuni/2025-blog-public'
 							target='_blank'
 							rel='noreferrer'
-							whileHover={{ scale: 1.1, rotate: 5 }}
-							className='bg-card flex h-[58px] w-[58px] items-center justify-center rounded-full border shadow-sm transition-shadow hover:shadow-lg'>
+							whileHover={{ scale: 1.1 }}
+							className='bg-card flex h-[58px] w-[58px] items-center justify-center rounded-full border shadow-sm'>
 							<GithubSVG />
 						</motion.a>
 						<LikeButton slug='about-studio' delay={0.1} />
@@ -208,28 +207,18 @@ export default function Page() {
 				</div>
 			</div>
 
+			{/* 管理浮动面板 */}
 			<AnimatePresence>
-				<motion.div 
-					initial={{ opacity: 0, y: 20 }} 
-					animate={{ opacity: 1, y: 0 }} 
-					exit={{ opacity: 0, y: 20 }}
-					className='fixed bottom-8 right-8 z-50 flex gap-3 max-sm:bottom-4 max-sm:right-4'
-				>
+				<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className='fixed bottom-8 right-8 z-50 flex gap-3 max-sm:bottom-4'>
 					{isEditMode ? (
-						<div className='flex gap-2 p-2 bg-white/80 backdrop-blur-xl border rounded-2xl shadow-2xl'>
-							<button onClick={handleCancel} disabled={isSaving} className='px-4 py-2 text-xs font-medium hover:bg-black/5 rounded-xl transition-colors'>
-								取消
-							</button>
-							<button onClick={() => setIsPreviewMode(!isPreviewMode)} disabled={isSaving} className='px-4 py-2 text-xs font-medium hover:bg-black/5 rounded-xl transition-colors border-x'>
-								{isPreviewMode ? '编辑' : '预览'}
-							</button>
-							<button onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6 py-2 text-xs shadow-lg shadow-brand/20'>
-								{isSaving ? '同步中...' : buttonText}
-							</button>
+						<div className='flex gap-2 p-2 bg-white/80 backdrop-blur-xl border rounded-2xl shadow-xl'>
+							<button onClick={handleCancel} disabled={isSaving} className='px-4 py-2 text-xs font-medium'>取消</button>
+							<button onClick={() => setIsPreviewMode(!isPreviewMode)} disabled={isSaving} className='px-4 py-2 text-xs font-medium border-x'>{isPreviewMode ? '编辑' : '预览'}</button>
+							<button onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6 py-2 text-xs'>{isSaving ? '同步中...' : buttonText}</button>
 						</div>
 					) : (
 						!hideEditButton && (
-							<button onClick={handleEnterEditMode} className='card px-6 py-3 text-xs font-bold tracking-widest uppercase backdrop-blur-md hover:border-brand/50 transition-all shadow-xl'>
+							<button onClick={handleEnterEditMode} className='card px-6 py-3 text-xs font-bold tracking-widest uppercase backdrop-blur-md hover:border-brand/50 transition-all'>
 								Enter Admin
 							</button>
 						)
