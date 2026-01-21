@@ -8,31 +8,65 @@ import { pushAbout, type AboutData } from './services/push-about'
 import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import LikeButton from '@/components/like-button'
+
+// 1. 引入基础 UI 图标 (Lucide)
 import { 
-    User, Cpu, History, Edit3, Eye, Save, X, 
-    Code2, Terminal, Database, Globe, Layout, Server, Shield, Zap 
+    User, Cpu, History, Edit3, Eye, Save, X, Zap 
 } from 'lucide-react' 
+
+// 2. 引入品牌图标 (React Icons) - 这就是你要的官方标
+import { 
+    FaLinux, FaReact, FaDocker, FaGitAlt, FaNodeJs, FaPython, FaJava, FaUbuntu, FaCentos
+} from 'react-icons/fa'
+import { 
+    SiNextdotjs, SiTypescript, SiTailwindcss, SiNginx, SiRedis, SiMongodb, SiMysql, 
+    SiPostgresql, SiVercel, SiCloudflare, SiJavascript, SiHtml5, SiCss3, SiKubernetes,
+    SiGnubash
+} from 'react-icons/si'
+import { VscTerminalLinux } from "react-icons/vsc"
 
 import GithubSVG from '@/svgs/github.svg'
 import initialData from './list.json'
 
-// --- 1. 图标映射配置 ---
-// 这里定义了关键词对应的图标和颜色，你可以随意添加
+// --- 3. 图标映射配置 (核心修改) ---
+// 关键词不区分大小写，程序会自动匹配
 const ICON_MAP: Record<string, { icon: any; color: string; bg: string }> = {
-    'Next.js': { icon: Globe, color: 'text-black dark:text-white', bg: 'bg-white dark:bg-zinc-800' },
-    'React': { icon: Code2, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    'TypeScript': { icon: Code2, color: 'text-blue-600', bg: 'bg-blue-600/10' },
-    'Tailwind': { icon: Layout, color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
-    'Linux': { icon: Terminal, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-    'Docker': { icon: Server, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-    'Git': { icon: Zap, color: 'text-orange-600', bg: 'bg-orange-600/10' },
-    'Database': { icon: Database, color: 'text-green-500', bg: 'bg-green-500/10' },
-    'Security': { icon: Shield, color: 'text-red-500', bg: 'bg-red-500/10' },
+    // === 运维 & 后端 ===
+    'linux': { icon: FaLinux, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800' }, // 官方企鹅
+    'ubuntu': { icon: FaUbuntu, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+    'centos': { icon: FaCentos, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    'bash': { icon: SiGnubash, color: 'text-zinc-600', bg: 'bg-zinc-600/10' },
+    'nginx': { icon: SiNginx, color: 'text-green-600', bg: 'bg-green-600/10' },
+    'docker': { icon: FaDocker, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    'k8s': { icon: SiKubernetes, color: 'text-blue-600', bg: 'bg-blue-600/10' },
+    'kubernetes': { icon: SiKubernetes, color: 'text-blue-600', bg: 'bg-blue-600/10' },
+    'redis': { icon: SiRedis, color: 'text-red-500', bg: 'bg-red-500/10' },
+    'mysql': { icon: SiMysql, color: 'text-blue-600', bg: 'bg-blue-600/10' },
+    'mongodb': { icon: SiMongodb, color: 'text-green-500', bg: 'bg-green-500/10' },
+    'node': { icon: FaNodeJs, color: 'text-green-600', bg: 'bg-green-600/10' },
+    'python': { icon: FaPython, color: 'text-blue-500', bg: 'bg-yellow-500/10' },
+    'java': { icon: FaJava, color: 'text-red-500', bg: 'bg-red-500/10' },
+
+    // === 前端 & 全栈 ===
+    'next': { icon: SiNextdotjs, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800' },
+    'react': { icon: FaReact, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+    'vue': { icon: Zap, color: 'text-green-500', bg: 'bg-green-500/10' }, // 如果需要 Vue 可以加 SiVuedotjs
+    'ts': { icon: SiTypescript, color: 'text-blue-600', bg: 'bg-blue-600/10' },
+    'typescript': { icon: SiTypescript, color: 'text-blue-600', bg: 'bg-blue-600/10' },
+    'js': { icon: SiJavascript, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
+    'tailwind': { icon: SiTailwindcss, color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
+    'html': { icon: SiHtml5, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+    'css': { icon: SiCss3, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+
+    // === 工具 & 平台 ===
+    'git': { icon: FaGitAlt, color: 'text-orange-600', bg: 'bg-orange-600/10' },
+    'vercel': { icon: SiVercel, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800' },
+    'cloudflare': { icon: SiCloudflare, color: 'text-orange-500', bg: 'bg-orange-500/10' },
 }
 
-const DEFAULT_ICON = { icon: Zap, color: 'text-zinc-500', bg: 'bg-zinc-500/10' }
+const DEFAULT_ICON = { icon: VscTerminalLinux, color: 'text-zinc-500', bg: 'bg-zinc-500/10' }
 
-// --- 2. 自定义展示组件：技术栈 (Grid布局) ---
+// --- 4. 技术栈展示组件 ---
 const TechStackViewer = ({ content }: { content: string }) => {
     // 解析每一行，去除 markdown 的列表符号 (- 或 *)
     const items = content.split('\n')
@@ -42,8 +76,9 @@ const TechStackViewer = ({ content }: { content: string }) => {
     return (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {items.map((item, idx) => {
-                // 简单的模糊匹配：看这一行字里是否包含配置的关键词
-                const matchedKey = Object.keys(ICON_MAP).find(k => item.toLowerCase().includes(k.toLowerCase()))
+                // 模糊匹配逻辑：只要包含关键词就显示图标
+                // 例如输入 "My Linux Server"，包含了 "linux"，就会显示企鹅
+                const matchedKey = Object.keys(ICON_MAP).find(k => item.toLowerCase().includes(k))
                 const style = matchedKey ? ICON_MAP[matchedKey] : DEFAULT_ICON
                 const Icon = style.icon
 
@@ -53,10 +88,10 @@ const TechStackViewer = ({ content }: { content: string }) => {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: idx * 0.05 }}
-                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/50 p-3 hover:bg-card transition-colors"
+                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/50 p-3 hover:bg-card transition-colors group"
                     >
-                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${style.bg} ${style.color}`}>
-                            <Icon className="h-4 w-4" />
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${style.bg} ${style.color} transition-transform group-hover:scale-110`}>
+                            <Icon className="h-5 w-5" />
                         </div>
                         <span className="text-sm font-medium truncate">{item}</span>
                     </motion.div>
@@ -66,23 +101,19 @@ const TechStackViewer = ({ content }: { content: string }) => {
     )
 }
 
-// --- 3. 自定义展示组件：时间轴 ---
+// --- 5. 时间轴展示组件 ---
 const TimelineViewer = ({ content }: { content: string }) => {
-    // 简单的正则匹配：日期 (空格) 内容
-    // 例如：2026-01-21 更新了XXX
     const lines = content.split('\n').filter(l => l.trim().length > 0)
     
     return (
         <div className="relative pl-2">
-            {/* 垂直连线 */}
             <div className="absolute left-[27px] top-2 bottom-2 w-0.5 bg-border/50" />
-
             <div className="space-y-6">
                 {lines.map((line, idx) => {
-                    // 尝试提取日期：匹配开头是数字和横杠的情况
+                    // 匹配日期：支持 2026-01-21 或 2026/01/21
                     const match = line.match(/^(\d{4}[-/]\d{1,2}[-/]\d{1,2})\s+(.*)$/)
                     const date = match ? match[1] : null
-                    const text = match ? match[2] : line.replace(/^[-*]\s+/, '') // 如果没日期，就当普通文字
+                    const text = match ? match[2] : line.replace(/^[-*]\s+/, '')
 
                     return (
                         <motion.div 
@@ -92,12 +123,9 @@ const TimelineViewer = ({ content }: { content: string }) => {
                             transition={{ delay: idx * 0.1 }}
                             className="relative flex gap-4 items-start group"
                         >
-                            {/* 时间点图标 */}
                             <div className="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border bg-card shadow-sm group-hover:scale-110 transition-transform mt-0.5">
                                 <div className="h-2 w-2 rounded-full bg-primary" />
                             </div>
-                            
-                            {/* 内容 */}
                             <div className="flex-1 space-y-1">
                                 {date && (
                                     <div className="text-xs font-mono text-secondary bg-secondary/10 px-2 py-0.5 rounded-md w-fit mb-1">
@@ -114,7 +142,7 @@ const TimelineViewer = ({ content }: { content: string }) => {
     )
 }
 
-// 简单的卡片容器
+// 卡片容器
 const CardBox = ({ title, icon: Icon, children, className = '' }: { title?: string; icon?: any; children: React.ReactNode; className?: string }) => (
 	<div className={`card relative p-6 flex flex-col ${className}`}>
 		{(title || Icon) && (
@@ -128,7 +156,6 @@ const CardBox = ({ title, icon: Icon, children, className = '' }: { title?: stri
 )
 
 export default function Page() {
-	// 确保 initialData 包含所有字段
 	const safeInitialData = {
 		title: '',
 		description: '',
@@ -148,8 +175,6 @@ export default function Page() {
 	const { isAuth, setPrivateKey } = useAuthStore()
 	const { siteContent } = useConfigStore()
 	const hideEditButton = siteContent.hideEditButton ?? false
-
-	// 个人介绍依然使用 Markdown 渲染
 	const { content: introContent } = useMarkdownRender(data.content)
 
 	const handleChoosePrivateKey = async (file: File) => {
@@ -233,7 +258,6 @@ export default function Page() {
 			<div className='flex flex-col items-center justify-center px-4 pt-24 pb-12 w-full'>
 				<div className='w-full max-w-[1200px] space-y-8'>
 					
-					{/* 顶部标题区 */}
 					{isEditMode && !isPreviewMode ? (
 						<div className="space-y-4 max-w-2xl mx-auto">
 							<input
@@ -258,13 +282,8 @@ export default function Page() {
 						</motion.div>
 					)}
 
-					{/* 核心布局：左二右一 */}
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-						
-						{/* 左侧容器 */}
 						<div className="lg:col-span-2 flex flex-col gap-6">
-							
-							{/* 左上：个人介绍 (Markdown) */}
 							<motion.div 
 								initial={{ opacity: 0, x: -20 }} 
 								animate={{ opacity: 1, x: 0 }} 
@@ -286,7 +305,6 @@ export default function Page() {
 								</CardBox>
 							</motion.div>
 
-							{/* 左下：技术栈 (图标+文字卡片) */}
 							<motion.div 
 								initial={{ opacity: 0, x: -20 }} 
 								animate={{ opacity: 1, x: 0 }} 
@@ -296,20 +314,18 @@ export default function Page() {
 								<CardBox title="技术栈" icon={Cpu} className="h-full bg-card/50 backdrop-blur-sm">
 									{isEditMode && !isPreviewMode ? (
 										<textarea
-											placeholder="一行写一个技术，例如：&#13;&#10;React&#13;&#10;Next.js&#13;&#10;Docker"
+											placeholder="一行写一个技术，会自动匹配图标。例如：&#13;&#10;Linux运维&#13;&#10;Next.js开发&#13;&#10;Docker容器"
 											className={textareaClass}
 											value={data.techStack}
 											onChange={e => setData({ ...data, techStack: e.target.value })}
 										/>
 									) : (
-                                        // 使用自定义的 TechStackViewer
 										<TechStackViewer content={data.techStack} />
 									)}
 								</CardBox>
 							</motion.div>
 						</div>
 
-						{/* 右侧：更新日志 (时间轴) */}
 						<motion.div 
 							initial={{ opacity: 0, x: 20 }} 
 							animate={{ opacity: 1, x: 0 }} 
@@ -325,14 +341,12 @@ export default function Page() {
 										onChange={e => setData({ ...data, changelog: e.target.value })}
 									/>
 								) : (
-                                    // 使用自定义的 TimelineViewer
 									<TimelineViewer content={data.changelog} />
 								)}
 							</CardBox>
 						</motion.div>
 					</div>
 
-					{/* 底部社交链接 */}
 					<div className='mt-12 flex flex-col items-center justify-center gap-6'>
 						<motion.a
 							href='https://github.com/spencerkk920'
@@ -350,7 +364,6 @@ export default function Page() {
 				</div>
 			</div>
 
-			{/* 悬浮操作栏 */}
 			<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className='fixed top-4 right-6 z-20 flex gap-3 max-sm:hidden'>
 				{isEditMode ? (
 					<>
