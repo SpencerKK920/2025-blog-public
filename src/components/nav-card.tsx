@@ -30,6 +30,12 @@ import TraktFilledSVG from '@/svgs/trakt-filled.svg'
 
 
 const list = [
+	   {
+        icon: TraktOutlineSVG,
+        iconActive: TraktFilledSVG,
+        label: '首页',
+        href: '/board'
+    },
 	{
 		icon: ScrollOutlineSVG,
 		iconActive: ScrollFilledSVG,
@@ -66,12 +72,6 @@ const list = [
 		label: '影视记录',
 		href: '/anime'
 	},
-   {
-        icon: TraktOutlineSVG,
-        iconActive: TraktFilledSVG,
-        label: '文章看板',
-        href: '/board'
-    }
 ]
 
 const extraSize = 8
@@ -119,7 +119,7 @@ export default function NavCard() {
 
 	const size = useMemo(() => {
 		if (form === 'mini') return { width: 64, height: 64 }
-		else if (form === 'icons') return { width: 400, height: 64 }
+		else if (form === 'icons') return { width: 500, height: 64 }
 		else return { width: styles.width, height: styles.height }
 	}, [form, styles])
 
@@ -155,7 +155,7 @@ export default function NavCard() {
 						</>
 					)}
 
-					<Link className='flex items-center gap-3' href='/'>
+					<Link className='flex items-center gap-3 shrink-0' href='/'>
 						<Image src='/images/avatar.png' alt='avatar' width={40} height={40} style={{ boxShadow: ' 0 12px 20px -5px #E2D9CE' }} className='rounded-full' />
 						{form === 'full' && <span className='font-averia mt-1 text-2xl leading-none font-medium'>{siteContent.meta.title}</span>}
 						{form === 'full' && <span className='text-brand mt-2 text-xs font-medium'>(开发中)</span>}
