@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion } from 'motion/react'
 import { toast } from 'sonner'
 import { useMarkdownRender } from '@/hooks/use-markdown-render'
 import { pushAbout, type AboutData } from './services/push-about'
@@ -9,44 +9,35 @@ import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import LikeButton from '@/components/like-button'
 
-// === 1. 图标库引入 ===
-// 基础 UI 图标
+// === 1. 图标库引入 (只保留最常用的) ===
 import { 
-    User, Cpu, History, Edit3, Eye, Save, X, Plus, Search, ChevronDown, ChevronUp
+    User, Cpu, History, Edit3, Eye, Save, X 
 } from 'lucide-react' 
 
-// 品牌图标 (React Icons) - 预置大量常用技术栈
 import { 
-    FaLinux, FaReact, FaDocker, FaGitAlt, FaNodeJs, FaPython, FaJava, FaUbuntu, FaCentos, FaRust, FaSwift, FaPhp, FaAws, FaFigma
+    FaLinux, FaReact, FaDocker, FaGitAlt, FaNodeJs, FaPython, FaJava, FaUbuntu, FaRust, FaPhp, FaAws, FaFigma 
 } from 'react-icons/fa'
+
 import { 
     SiNextdotjs, SiTypescript, SiTailwindcss, SiNginx, SiRedis, SiMongodb, SiMysql, 
     SiPostgresql, SiVercel, SiCloudflare, SiJavascript, SiHtml5, SiCss3, SiKubernetes,
-    SiGnubash, SiVuedotjs, SiGo, SiSvelte, SiAngular, SiDart, SiKotlin, SiCplusplus,
-    SiCsharp, SiRuby, SiSupabase, SiFirebase, SiPrisma, SiGraphql, SiNestjs, SiExpress,
-    SiDeno, SiBun, SiVite, SiWebpack, SiElectron, SiFlutter, SiExpo, SiAndroid, SiIos,
-    SiWindows, SiMacos, SiDebian, SiArchlinux, SiKalilinux, SiJenkins, SiGitlab, SiGithub,
-    SiBitbucket, SiNotion, SiObsidian, SiPostman, SiIntellijidea, SiVisualstudiocode,
-    SiNeovim, SiSublimetext, SiAdobexd, SiAdobephotoshop, SiAdobeillustrator
+    SiVuedotjs, SiGo, SiSvelte, SiAngular, SiKotlin, SiCplusplus, SiCsharp, 
+    SiSupabase, SiFirebase, SiPrisma, SiNestjs, SiExpress, SiBun, SiVite, 
+    SiFlutter, SiGithub, SiNotion, SiPostman, SiIntellijidea, SiVisualstudiocode,
+    SiAndroid, SiIos
 } from 'react-icons/si'
-import { VscTerminalLinux, VscCode } from "react-icons/vsc"
-import { TbBrandSolidjs, TbBrandGolang } from "react-icons/tb"
 
+import { VscTerminalLinux } from "react-icons/vsc"
 import GithubSVG from '@/svgs/github.svg'
 import initialData from './list.json'
 
-// === 2. 图标定义数据 (这是核心，定义了所有可选的图标) ===
+// === 2. 精简后的图标数据 (每个领域约10个) ===
 type TechIconDef = {
-    id: string;      // 匹配关键词 (小写)
-    label: string;   // 显示名称 (添加到文本框的文字)
-    icon: any;       // 图标组件
-    color: string;   // 图标颜色类
-    bg: string;      // 背景颜色类
-    category: 'lang' | 'front' | 'back' | 'db' | 'ops' | 'tool'; // 分类
+    id: string; label: string; icon: any; color: string; bg: string; category: string;
 }
 
 const ALL_ICONS: TechIconDef[] = [
-    // --- 语言 ---
+    // --- 语言 (10个) ---
     { id: 'ts', label: 'TypeScript', icon: SiTypescript, color: 'text-blue-600', bg: 'bg-blue-600/10', category: 'lang' },
     { id: 'js', label: 'JavaScript', icon: SiJavascript, color: 'text-yellow-400', bg: 'bg-yellow-400/10', category: 'lang' },
     { id: 'python', label: 'Python', icon: FaPython, color: 'text-blue-500', bg: 'bg-blue-500/10', category: 'lang' },
@@ -56,92 +47,95 @@ const ALL_ICONS: TechIconDef[] = [
     { id: 'c++', label: 'C++', icon: SiCplusplus, color: 'text-blue-700', bg: 'bg-blue-700/10', category: 'lang' },
     { id: 'c#', label: 'C#', icon: SiCsharp, color: 'text-purple-600', bg: 'bg-purple-600/10', category: 'lang' },
     { id: 'php', label: 'PHP', icon: FaPhp, color: 'text-indigo-400', bg: 'bg-indigo-400/10', category: 'lang' },
+    { id: 'kotlin', label: 'Kotlin', icon: SiKotlin, color: 'text-purple-500', bg: 'bg-purple-500/10', category: 'lang' },
     
-    // --- 前端 ---
+    // --- 前端 (10个) ---
     { id: 'react', label: 'React', icon: FaReact, color: 'text-blue-400', bg: 'bg-blue-400/10', category: 'front' },
     { id: 'vue', label: 'Vue.js', icon: SiVuedotjs, color: 'text-green-500', bg: 'bg-green-500/10', category: 'front' },
     { id: 'next', label: 'Next.js', icon: SiNextdotjs, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800', category: 'front' },
     { id: 'angular', label: 'Angular', icon: SiAngular, color: 'text-red-600', bg: 'bg-red-600/10', category: 'front' },
     { id: 'svelte', label: 'Svelte', icon: SiSvelte, color: 'text-orange-500', bg: 'bg-orange-500/10', category: 'front' },
-    { id: 'tailwind', label: 'TailwindCSS', icon: SiTailwindcss, color: 'text-cyan-400', bg: 'bg-cyan-400/10', category: 'front' },
+    { id: 'tailwind', label: 'Tailwind', icon: SiTailwindcss, color: 'text-cyan-400', bg: 'bg-cyan-400/10', category: 'front' },
     { id: 'html', label: 'HTML5', icon: SiHtml5, color: 'text-orange-500', bg: 'bg-orange-500/10', category: 'front' },
+    { id: 'css', label: 'CSS3', icon: SiCss3, color: 'text-blue-500', bg: 'bg-blue-500/10', category: 'front' },
     { id: 'vite', label: 'Vite', icon: SiVite, color: 'text-purple-500', bg: 'bg-purple-500/10', category: 'front' },
     { id: 'flutter', label: 'Flutter', icon: SiFlutter, color: 'text-cyan-400', bg: 'bg-cyan-400/10', category: 'front' },
 
-    // --- 后端 ---
+    // --- 后端 (5个) ---
     { id: 'node', label: 'Node.js', icon: FaNodeJs, color: 'text-green-600', bg: 'bg-green-600/10', category: 'back' },
     { id: 'nest', label: 'NestJS', icon: SiNestjs, color: 'text-red-600', bg: 'bg-red-600/10', category: 'back' },
     { id: 'express', label: 'Express', icon: SiExpress, color: 'text-zinc-500', bg: 'bg-zinc-500/10', category: 'back' },
     { id: 'bun', label: 'Bun', icon: SiBun, color: 'text-orange-100', bg: 'bg-orange-100/10', category: 'back' },
+    { id: 'android', label: 'Android', icon: SiAndroid, color: 'text-green-500', bg: 'bg-green-500/10', category: 'back' },
     
-    // --- 数据库 ---
+    // --- 数据库 (7个) ---
     { id: 'mysql', label: 'MySQL', icon: SiMysql, color: 'text-blue-600', bg: 'bg-blue-600/10', category: 'db' },
     { id: 'postgres', label: 'PostgreSQL', icon: SiPostgresql, color: 'text-blue-400', bg: 'bg-blue-400/10', category: 'db' },
     { id: 'mongo', label: 'MongoDB', icon: SiMongodb, color: 'text-green-500', bg: 'bg-green-500/10', category: 'db' },
     { id: 'redis', label: 'Redis', icon: SiRedis, color: 'text-red-500', bg: 'bg-red-500/10', category: 'db' },
     { id: 'supabase', label: 'Supabase', icon: SiSupabase, color: 'text-green-400', bg: 'bg-green-400/10', category: 'db' },
+    { id: 'firebase', label: 'Firebase', icon: SiFirebase, color: 'text-yellow-500', bg: 'bg-yellow-500/10', category: 'db' },
     { id: 'prisma', label: 'Prisma', icon: SiPrisma, color: 'text-indigo-900 dark:text-indigo-300', bg: 'bg-indigo-500/10', category: 'db' },
 
-    // --- 运维/DevOps ---
+    // --- 运维 (10个) ---
     { id: 'linux', label: 'Linux', icon: FaLinux, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800', category: 'ops' },
     { id: 'docker', label: 'Docker', icon: FaDocker, color: 'text-blue-500', bg: 'bg-blue-500/10', category: 'ops' },
-    { id: 'k8s', label: 'Kubernetes', icon: SiKubernetes, color: 'text-blue-600', bg: 'bg-blue-600/10', category: 'ops' },
+    { id: 'k8s', label: 'K8s', icon: SiKubernetes, color: 'text-blue-600', bg: 'bg-blue-600/10', category: 'ops' },
     { id: 'git', label: 'Git', icon: FaGitAlt, color: 'text-orange-600', bg: 'bg-orange-600/10', category: 'ops' },
     { id: 'nginx', label: 'Nginx', icon: SiNginx, color: 'text-green-600', bg: 'bg-green-600/10', category: 'ops' },
     { id: 'aws', label: 'AWS', icon: FaAws, color: 'text-orange-500', bg: 'bg-orange-500/10', category: 'ops' },
     { id: 'vercel', label: 'Vercel', icon: SiVercel, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800', category: 'ops' },
     { id: 'cloudflare', label: 'Cloudflare', icon: SiCloudflare, color: 'text-orange-500', bg: 'bg-orange-500/10', category: 'ops' },
     { id: 'ubuntu', label: 'Ubuntu', icon: FaUbuntu, color: 'text-orange-500', bg: 'bg-orange-500/10', category: 'ops' },
+    { id: 'github', label: 'GitHub', icon: SiGithub, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800', category: 'ops' },
     
-    // --- 工具 ---
+    // --- 工具 (6个) ---
     { id: 'vscode', label: 'VS Code', icon: SiVisualstudiocode, color: 'text-blue-500', bg: 'bg-blue-500/10', category: 'tool' },
+    { id: 'idea', label: 'IntelliJ', icon: SiIntellijidea, color: 'text-pink-500', bg: 'bg-pink-500/10', category: 'tool' },
     { id: 'figma', label: 'Figma', icon: FaFigma, color: 'text-purple-500', bg: 'bg-purple-500/10', category: 'tool' },
     { id: 'notion', label: 'Notion', icon: SiNotion, color: 'text-black dark:text-white', bg: 'bg-zinc-100 dark:bg-zinc-800', category: 'tool' },
     { id: 'postman', label: 'Postman', icon: SiPostman, color: 'text-orange-500', bg: 'bg-orange-500/10', category: 'tool' },
 ]
 
-// 默认图标（匹配不到时显示）
 const DEFAULT_ICON = { icon: VscTerminalLinux, color: 'text-zinc-500', bg: 'bg-zinc-500/10' }
 
-// === 3. 组件：图标选择器面板 ===
+// === 3. 图标选择器组件 ===
 const IconSelector = ({ onSelect }: { onSelect: (label: string) => void }) => {
     const categories = [
         { id: 'lang', name: '语言' },
         { id: 'front', name: '前端' },
         { id: 'back', name: '后端' },
-        { id: 'db', name: '数据库' },
+        { id: 'db', name: '数据' },
         { id: 'ops', name: '运维' },
         { id: 'tool', name: '工具' },
     ]
-
     const [activeCat, setActiveCat] = useState('lang')
 
     return (
         <div className="mt-4 border rounded-xl bg-card overflow-hidden shadow-sm">
-            <div className="flex items-center gap-1 p-2 bg-muted/50 border-b overflow-x-auto">
+            <div className="flex items-center gap-2 p-2 bg-muted/50 border-b overflow-x-auto no-scrollbar">
                 {categories.map(cat => (
                     <button
                         key={cat.id}
                         onClick={() => setActiveCat(cat.id)}
-                        className={`px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap ${
                             activeCat === cat.id 
-                                ? 'bg-primary text-primary-foreground shadow-sm' 
-                                : 'hover:bg-background text-muted-foreground'
+                                ? 'bg-white dark:bg-zinc-700 text-foreground shadow-sm' 
+                                : 'text-muted-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
                         }`}
                     >
                         {cat.name}
                     </button>
                 ))}
             </div>
-            <div className="p-3 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 max-h-[200px] overflow-y-auto custom-scrollbar">
+            <div className="p-3 grid grid-cols-5 gap-2">
                 {ALL_ICONS.filter(i => i.category === activeCat).map((item) => {
                     const Icon = item.icon
                     return (
                         <button
                             key={item.id}
                             onClick={() => onSelect(item.label)}
-                            className="flex flex-col items-center justify-center gap-1.5 p-2 rounded-lg hover:bg-accent border border-transparent hover:border-border transition-all group"
-                            title={`添加 ${item.label}`}
+                            className="flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-accent border border-transparent hover:border-border transition-all group"
                         >
                             <div className={`w-8 h-8 rounded-md flex items-center justify-center ${item.bg} group-hover:scale-110 transition-transform`}>
                                 <Icon className={`w-5 h-5 ${item.color}`} />
@@ -155,7 +149,7 @@ const IconSelector = ({ onSelect }: { onSelect: (label: string) => void }) => {
     )
 }
 
-// === 4. 组件：技术栈展示 (预览模式) ===
+// === 4. 技术栈展示组件 (预览模式) ===
 const TechStackViewer = ({ content }: { content: string }) => {
     const items = content.split('\n')
         .map(line => line.replace(/^[-*]\s+/, '').trim())
@@ -164,12 +158,10 @@ const TechStackViewer = ({ content }: { content: string }) => {
     return (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {items.map((item, idx) => {
-                // 查找匹配的图标定义
                 const matchedDef = ALL_ICONS.find(def => 
                     item.toLowerCase().includes(def.id) || 
                     item.toLowerCase() === def.label.toLowerCase()
                 )
-                
                 const style = matchedDef || DEFAULT_ICON
                 const Icon = style.icon
 
@@ -192,7 +184,7 @@ const TechStackViewer = ({ content }: { content: string }) => {
     )
 }
 
-// === 5. 组件：时间轴展示 ===
+// === 5. 时间轴展示组件 ===
 const TimelineViewer = ({ content }: { content: string }) => {
     const lines = content.split('\n').filter(l => l.trim().length > 0)
     return (
@@ -302,7 +294,6 @@ export default function Page() {
     // 辅助函数：添加图标到文本框
     const addTechToStack = (label: string) => {
         const current = data.techStack
-        // 如果最后一行不是空行，先换行
         const prefix = current.length > 0 && !current.endsWith('\n') ? '\n' : ''
         setData({ ...data, techStack: current + prefix + label })
         toast.success(`已添加 ${label}`)
@@ -373,7 +364,6 @@ export default function Page() {
                                                     onChange={e => setData({ ...data, techStack: e.target.value })} 
                                                 />
                                             </div>
-                                            {/* 新增：图标选择器 */}
                                             <IconSelector onSelect={addTechToStack} />
                                         </div>
 									) : (
