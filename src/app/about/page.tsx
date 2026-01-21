@@ -18,7 +18,6 @@ import {
     FaLinux, FaReact, FaDocker, FaGitAlt, FaNodeJs, FaPython, FaJava, FaUbuntu, FaRust, FaPhp, FaAws, FaFigma, FaAndroid, FaApple
 } from 'react-icons/fa'
 
-// 移除了容易报错的 SiCsharp, SiCplusplus, SiBun 等
 import { 
     SiNextdotjs, SiTypescript, SiTailwindcss, SiNginx, SiRedis, SiMongodb, SiMysql, 
     SiPostgresql, SiVercel, SiCloudflare, SiJavascript, SiHtml5, SiCss3, SiKubernetes,
@@ -31,7 +30,7 @@ import { VscTerminalLinux } from "react-icons/vsc"
 import GithubSVG from '@/svgs/github.svg'
 import initialData from './list.json'
 
-// === 2. 精简后的图标数据 (已移除报错项) ===
+// === 2. 图标数据定义 ===
 type TechIconDef = {
     id: string; label: string; icon: any; color: string; bg: string; category: string;
 }
@@ -258,3 +257,151 @@ export default function Page() {
 			keyInputRef.current?.click()
 		} else {
 			handleSave()
+		}
+	}
+
+	const handleEnterEditMode = () => {
+		setIsEditMode(true)
+		setIsPreviewMode(false)
+	}
+
+	const handleSave = async () => {
+		setIsSaving(true)
+		try {
+			await pushAbout(data)
+			setOriginalData(data)
+			setIsEditMode(false)
+			setIsPreviewMode(false)
+			toast.success('保存成功！')
+		} catch (error: any) {
+			console.error('Failed to save:', error)
+			toast.error(`保存失败: ${error?.message || '未知错误'}`)
+		} finally {
+			setIsSaving(false)
+		}
+	}
+
+	const handleCancel = () => {
+		setData(originalData)
+		setIsEditMode(false)
+		setIsPreviewMode(false)
+	}
+
+    // 辅助函数：添加图标到文本框
+    const addTechToStack = (label: string) => {
+        const current = data.techStack
+        const prefix = current.length > 0 && !current.endsWith('\n') ? '\n' : ''
+        setData({ ...data, techStack: current + prefix + label })
+        toast.success(`已添加 ${label}`)
+    }
+
+	const buttonText = isAuth ? '保存更新' : '导入密钥'
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (!isEditMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
+				e.preventDefault()
+				setIsEditMode(true)
+				setIsPreviewMode(false)
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [isEditMode])
+
+	const textareaClass = "w-full h-full resize-none bg-transparent p-2 text-sm focus:outline-none font-mono leading-relaxed min-h-[150px]"
+
+	return (
+		<>
+			<input ref={keyInputRef} type='file' accept='.pem' className='hidden' onChange={async e => {
+				const f = e.target.files?.[0]
+				if (f) await handleChoosePrivateKey(f)
+				if (e.currentTarget) e.currentTarget.value = ''
+			}} />
+
+			<div className='flex flex-col items-center justify-center px-4 pt-24 pb-12 w-full'>
+				<div className='w-full max-w-[1200px] space-y-8'>
+					
+					{isEditMode && !isPreviewMode ? (
+						<div className="space-y-4 max-w-2xl mx-auto">
+							<input type='text' placeholder='页面标题' className='w-full text-center text-3xl font-bold bg-transparent border-b border-border/50 pb-2 focus:outline-none focus:border-primary' value={data.title} onChange={e => setData({ ...data, title: e.target.value })} />
+							<input type='text' placeholder='页面简短描述' className='w-full text-center text-lg text-secondary bg-transparent focus:outline-none' value={data.description} onChange={e => setData({ ...data, description: e.target.value })} />
+						</div>
+					) : (
+						<motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className='text-center mb-8'>
+							<h1 className='text-4xl font-bold mb-3'>{data.title}</h1>
+							<p className='text-secondary text-lg'>{data.description}</p>
+						</motion.div>
+					)}
+
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+						<div className="lg:col-span-2 flex flex-col gap-6">
+							<motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="min-h-[250px]">
+								<CardBox title="个人介绍" icon={User} className="h-full bg-card/50 backdrop-blur-sm">
+									{isEditMode && !isPreviewMode ? (
+										<textarea placeholder="支持 Markdown..." className={textareaClass} value={data.content} onChange={e => setData({ ...data, content: e.target.value })} />
+									) : (
+										<div className="prose prose-sm dark:prose-invert max-w-none">{introContent}</div>
+									)}
+								</CardBox>
+							</motion.div>
+
+							<motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="min-h-[200px]">
+								<CardBox title="技术栈" icon={Cpu} className="h-full bg-card/50 backdrop-blur-sm">
+									{isEditMode && !isPreviewMode ? (
+                                        <div className="flex flex-col h-full">
+                                            <div className="flex-1 min-h-[120px]">
+                                                <textarea 
+                                                    placeholder="点击下方图标添加..." 
+                                                    className={`${textareaClass} border-b border-border/50 mb-2`}
+                                                    value={data.techStack} 
+                                                    onChange={e => setData({ ...data, techStack: e.target.value })} 
+                                                />
+                                            </div>
+                                            <IconSelector onSelect={addTechToStack} />
+                                        </div>
+									) : (
+										<TechStackViewer content={data.techStack} />
+									)}
+								</CardBox>
+							</motion.div>
+						</div>
+
+						<motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-1 h-full min-h-[500px]">
+							<CardBox title="更新日志" icon={History} className="h-full bg-card/50 backdrop-blur-sm border-l-4 border-l-primary/20">
+								{isEditMode && !isPreviewMode ? (
+									<textarea placeholder="格式：日期 + 内容，例如：&#13;&#10;2026-01-21 更新了首页" className={textareaClass} value={data.changelog} onChange={e => setData({ ...data, changelog: e.target.value })} />
+								) : (
+									<TimelineViewer content={data.changelog} />
+								)}
+							</CardBox>
+						</motion.div>
+					</div>
+
+					<div className='mt-12 flex flex-col items-center justify-center gap-6'>
+						<motion.a href='https://github.com/spencerkk920' target='_blank' rel='noreferrer' initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ scale: 1.1 }} className='bg-card flex h-[50px] w-[50px] items-center justify-center rounded-full border shadow-sm text-secondary hover:text-primary transition-colors'>
+							<GithubSVG className="w-6 h-6" />
+						</motion.a>
+						<LikeButton slug='about-page' delay={0.3} />
+					</div>
+				</div>
+			</div>
+
+			<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className='fixed top-4 right-6 z-20 flex gap-3 max-sm:hidden'>
+				{isEditMode ? (
+					<>
+						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleCancel} disabled={isSaving} className='flex items-center gap-2 rounded-xl border bg-white/80 px-4 py-2 text-sm shadow-sm backdrop-blur dark:bg-zinc-800/80 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors'><X className="w-4 h-4" /> 取消</motion.button>
+						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setIsPreviewMode(prev => !prev)} disabled={isSaving} className={`flex items-center gap-2 rounded-xl border bg-white/80 px-4 py-2 text-sm shadow-sm backdrop-blur dark:bg-zinc-800/80`}>{isPreviewMode ? <><Edit3 className="w-4 h-4"/> 继续编辑</> : <><Eye className="w-4 h-4"/> 预览效果</>}</motion.button>
+						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6 flex items-center gap-2 shadow-md'><Save className="w-4 h-4" />{isSaving ? '保存中...' : buttonText}</motion.button>
+					</>
+				) : (
+					!hideEditButton && (
+						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleEnterEditMode} className='flex items-center gap-2 rounded-xl border bg-white/60 px-4 py-2 text-sm backdrop-blur-md transition-colors hover:bg-white/90 shadow-sm dark:bg-zinc-800/60'><Edit3 className="w-4 h-4" /> 编辑页面</motion.button>
+					)
+				)}
+			</motion.div>
+		</>
+	)
+}
