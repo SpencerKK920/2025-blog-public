@@ -8,7 +8,7 @@ import { pushAbout, type AboutData } from './services/push-about'
 import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import LikeButton from '@/components/like-button'
-import { User, Cpu, History, Edit3, Eye, Save, X } from 'lucide-react' // 引入图标
+import { User, Cpu, History, Edit3, Eye, Save, X } from 'lucide-react' 
 
 import GithubSVG from '@/svgs/github.svg'
 import initialData from './list.json'
@@ -212,11 +212,91 @@ export default function Page() {
 							</motion.div>
 						</div>
 
-						{/* 右侧：更新日志 (长框) */}
+						{/* 右侧：更新日志 (长框) - 这里是之前报错的地方 */}
 						<motion.div 
 							initial={{ opacity: 0, x: 20 }} 
 							animate={{ opacity: 1, x: 0 }} 
 							transition={{ delay: 0.2 }}
 							className="lg:col-span-1 h-full min-h-[400px]"
 						>
-							<CardBox title
+							<CardBox title="更新记录" icon={History} className="h-full bg-card/50 backdrop-blur-sm border-l-4 border-l-primary/20">
+								{isEditMode && !isPreviewMode ? (
+									<textarea
+										placeholder="### 2026-01-21..."
+										className={textareaClass}
+										value={data.changelog}
+										onChange={e => setData({ ...data, changelog: e.target.value })}
+									/>
+								) : (
+									<div className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-base prose-headings:mb-2 prose-p:my-1 prose-ul:my-2">
+										{logContent}
+									</div>
+								)}
+							</CardBox>
+						</motion.div>
+					</div>
+
+					{/* 底部社交链接与点赞 */}
+					<div className='mt-12 flex flex-col items-center justify-center gap-6'>
+						<motion.a
+							href='https://github.com/spencerkk920'
+							target='_blank'
+							rel='noreferrer'
+							initial={{ opacity: 0, scale: 0.6 }}
+							animate={{ opacity: 1, scale: 1 }}
+							whileHover={{ scale: 1.1 }}
+							className='bg-card flex h-[50px] w-[50px] items-center justify-center rounded-full border shadow-sm text-secondary hover:text-primary transition-colors'>
+							<GithubSVG className="w-6 h-6" />
+						</motion.a>
+
+						<LikeButton slug='about-page' delay={0.3} />
+					</div>
+				</div>
+			</div>
+
+			{/* 悬浮操作栏 */}
+			<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className='fixed top-4 right-6 z-20 flex gap-3 max-sm:hidden'>
+				{isEditMode ? (
+					<>
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={handleCancel}
+							disabled={isSaving}
+							className='flex items-center gap-2 rounded-xl border bg-white/80 px-4 py-2 text-sm shadow-sm backdrop-blur dark:bg-zinc-800/80 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors'>
+							<X className="w-4 h-4" /> 取消
+						</motion.button>
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={() => setIsPreviewMode(prev => !prev)}
+							disabled={isSaving}
+							className={`flex items-center gap-2 rounded-xl border bg-white/80 px-4 py-2 text-sm shadow-sm backdrop-blur dark:bg-zinc-800/80`}>
+							{isPreviewMode ? <><Edit3 className="w-4 h-4"/> 继续编辑</> : <><Eye className="w-4 h-4"/> 预览效果</>}
+						</motion.button>
+						<motion.button 
+                            whileHover={{ scale: 1.05 }} 
+                            whileTap={{ scale: 0.95 }} 
+                            onClick={handleSaveClick} 
+                            disabled={isSaving} 
+                            className='brand-btn px-6 flex items-center gap-2 shadow-md'
+                        >
+							<Save className="w-4 h-4" />
+							{isSaving ? '保存中...' : buttonText}
+						</motion.button>
+					</>
+				) : (
+					!hideEditButton && (
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={handleEnterEditMode}
+							className='flex items-center gap-2 rounded-xl border bg-white/60 px-4 py-2 text-sm backdrop-blur-md transition-colors hover:bg-white/90 shadow-sm dark:bg-zinc-800/60'>
+							<Edit3 className="w-4 h-4" /> 编辑页面
+						</motion.button>
+					)
+				)}
+			</motion.div>
+		</>
+	)
+}
