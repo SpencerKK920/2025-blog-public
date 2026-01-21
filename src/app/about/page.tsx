@@ -3,40 +3,61 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { toast } from 'sonner'
-import Image from 'next/image' // 新增: 用于显示头像
 import { useMarkdownRender } from '@/hooks/use-markdown-render'
 import { pushAbout, type AboutData } from './services/push-about'
 import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import LikeButton from '@/components/like-button'
+import { User, Cpu, History, Edit3, Eye, Save, X } from 'lucide-react' // 使用 lucide 图标
 
-// 引入图标 (根据您 src/svgs 目录下的文件)
 import GithubSVG from '@/svgs/github.svg'
-import BilibiliSVG from '@/svgs/bilibili-outline.svg' // 假设您想展示B站
-import EmailSVG from '@/svgs/email.svg'
-// import TwitterSVG from '@/svgs/x.svg' // 如果需要可以解开注释
-
 import initialData from './list.json'
 
+// 简单的卡片组件包装器
+const CardBox = ({ title, icon: Icon, children, className = '' }: { title?: string; icon?: any; children: React.ReactNode; className?: string }) => (
+	<div className={`card relative p-6 flex flex-col ${className}`}>
+		{(title || Icon) && (
+			<div className="flex items-center gap-2 mb-4 border-b pb-2 border-border/50">
+				{Icon && <Icon className="w-5 h-5 text-primary" />}
+				{title && <h3 className="font-bold text-lg">{title}</h3>}
+			</div>
+		)}
+		<div className="flex-1 overflow-auto">{children}</div>
+	</div>
+)
+
 export default function Page() {
-    const [data, setData] = useState<AboutData>(initialData as AboutData)
-    const [originalData, setOriginalData] = useState<AboutData>(initialData as AboutData)
-    const [isEditMode, setIsEditMode] = useState(false)
-    const [isSaving, setIsSaving] = useState(false)
-    const [isPreviewMode, setIsPreviewMode] = useState(false)
-    const keyInputRef = useRef<HTMLInputElement>(null)
+	// 确保 initialData 包含所有字段，避免 undefined 报错
+	const safeInitialData = {
+		title: '',
+		description: '',
+		content: '',
+		techStack: '',
+		changelog: '',
+		...initialData
+	} as AboutData
 
-    const { isAuth, setPrivateKey } = useAuthStore()
-    const { siteContent } = useConfigStore()
-    const { content, loading } = useMarkdownRender(data.content)
-    const hideEditButton = siteContent.hideEditButton ?? false
+	const [data, setData] = useState<AboutData>(safeInitialData)
+	const [originalData, setOriginalData] = useState<AboutData>(safeInitialData)
+	const [isEditMode, setIsEditMode] = useState(false)
+	const [isSaving, setIsSaving] = useState(false)
+	const [isPreviewMode, setIsPreviewMode] = useState(false)
+	const keyInputRef = useRef<HTMLInputElement>(null)
 
-    // ... (保留原有的 handleChoosePrivateKey, handleSaveClick, handleEnterEditMode, handleSave, handleCancel 等函数不变) ...
-    const handleChoosePrivateKey = async (file: File) => {
+	const { isAuth, setPrivateKey } = useAuthStore()
+	const { siteContent } = useConfigStore()
+	const hideEditButton = siteContent.hideEditButton ?? false
+
+	// 分别渲染三个部分的 Markdown
+	const { content: introContent } = useMarkdownRender(data.content)
+	const { content: techContent } = useMarkdownRender(data.techStack)
+	const { content: logContent } = useMarkdownRender(data.changelog)
+
+	const handleChoosePrivateKey = async (file: File) => {
 		try {
 			const text = await file.text()
 			setPrivateKey(text)
-			await handleSave()
+			toast.success('密钥读取成功')
 		} catch (error) {
 			console.error('Failed to read private key:', error)
 			toast.error('读取密钥文件失败')
@@ -58,10 +79,8 @@ export default function Page() {
 
 	const handleSave = async () => {
 		setIsSaving(true)
-
 		try {
 			await pushAbout(data)
-
 			setOriginalData(data)
 			setIsEditMode(false)
 			setIsPreviewMode(false)
@@ -80,183 +99,123 @@ export default function Page() {
 		setIsPreviewMode(false)
 	}
 
-    const buttonText = isAuth ? '保存' : '导入密钥'
+	const buttonText = isAuth ? '保存更新' : '导入密钥'
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (!isEditMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
-                e.preventDefault()
-                setIsEditMode(true)
-                setIsPreviewMode(false)
-            }
-        }
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (!isEditMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
+				e.preventDefault()
+				setIsEditMode(true)
+				setIsPreviewMode(false)
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [isEditMode])
 
-        window.addEventListener('keydown', handleKeyDown)
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-        }
-    }, [isEditMode])
+	// 通用的编辑框样式
+	const textareaClass = "w-full h-full resize-none bg-transparent p-2 text-sm focus:outline-none font-mono leading-relaxed min-h-[150px]"
 
-    // 定义社交链接样式
-    const socialLinkClass = "bg-card text-secondary hover:text-primary hover:scale-110 transition-all flex h-[45px] w-[45px] items-center justify-center rounded-full border shadow-sm"
+	return (
+		<>
+			<input
+				ref={keyInputRef}
+				type='file'
+				accept='.pem'
+				className='hidden'
+				onChange={async e => {
+					const f = e.target.files?.[0]
+					if (f) await handleChoosePrivateKey(f)
+					if (e.currentTarget) e.currentTarget.value = ''
+				}}
+			/>
 
-    return (
-        <>
-            <input
-                ref={keyInputRef}
-                type='file'
-                accept='.pem'
-                className='hidden'
-                onChange={async e => {
-                    const f = e.target.files?.[0]
-                    if (f) await handleChoosePrivateKey(f)
-                    if (e.currentTarget) e.currentTarget.value = ''
-                }}
-            />
+			<div className='flex flex-col items-center justify-center px-4 pt-24 pb-12 w-full'>
+				<div className='w-full max-w-[1200px] space-y-8'>
+					
+					{/* 顶部标题区域 (仅在预览/查看模式显示大标题，编辑模式显示输入框) */}
+					{isEditMode && !isPreviewMode ? (
+						<div className="space-y-4 max-w-2xl mx-auto">
+							<input
+								type='text'
+								placeholder='页面标题'
+								className='w-full text-center text-3xl font-bold bg-transparent border-b border-border/50 pb-2 focus:outline-none focus:border-primary'
+								value={data.title}
+								onChange={e => setData({ ...data, title: e.target.value })}
+							/>
+							<input
+								type='text'
+								placeholder='页面简短描述'
+								className='w-full text-center text-lg text-secondary bg-transparent focus:outline-none'
+								value={data.description}
+								onChange={e => setData({ ...data, description: e.target.value })}
+							/>
+						</div>
+					) : (
+						<motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className='text-center mb-8'>
+							<h1 className='text-4xl font-bold mb-3'>{data.title}</h1>
+							<p className='text-secondary text-lg'>{data.description}</p>
+						</motion.div>
+					)}
 
-            <div className='flex flex-col items-center justify-center px-6 pt-32 pb-12 max-sm:px-4'>
-                <div className='w-full max-w-[800px]'>
-                    {isEditMode ? (
-                        // 编辑模式 (保持原有逻辑，稍作样式优化)
-                        isPreviewMode ? (
-                            <div className='space-y-6'>
-                                <div className='text-center border-b pb-6'>
-                                    <h1 className='mb-4 text-4xl font-bold'>{data.title || '标题预览'}</h1>
-                                    <p className='text-secondary text-lg'>{data.description || '描述预览'}</p>
-                                </div>
-                                {loading ? (
-                                    <div className='text-secondary text-center'>预览渲染中...</div>
-                                ) : (
-                                    <div className='card relative p-8'>
-                                        <div className='prose prose-zinc dark:prose-invert max-w-none'>{content}</div>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className='space-y-6'>
-                                <div className='space-y-4'>
-                                    <input
-                                        type='text'
-                                        placeholder='标题'
-                                        className='w-full bg-transparent px-4 py-3 text-center text-3xl font-bold focus:outline-none'
-                                        value={data.title}
-                                        onChange={e => setData({ ...data, title: e.target.value })}
-                                    />
-                                    <input
-                                        type='text'
-                                        placeholder='描述'
-                                        className='w-full bg-transparent px-4 py-2 text-center text-lg text-secondary focus:outline-none'
-                                        value={data.description}
-                                        onChange={e => setData({ ...data, description: e.target.value })}
-                                    />
-                                </div>
+					{/* 核心布局区域：左二右一 */}
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:min-h-[600px]">
+						
+						{/* 左侧两列容器 */}
+						<div className="lg:col-span-2 flex flex-col gap-6 h-full">
+							
+							{/* 左上：个人介绍 */}
+							<motion.div 
+								initial={{ opacity: 0, x: -20 }} 
+								animate={{ opacity: 1, x: 0 }} 
+								className="flex-1 min-h-[250px]"
+							>
+								<CardBox title="个人介绍" icon={User} className="h-full bg-card/50 backdrop-blur-sm">
+									{isEditMode && !isPreviewMode ? (
+										<textarea
+											placeholder="支持 Markdown 的个人介绍..."
+											className={textareaClass}
+											value={data.content}
+											onChange={e => setData({ ...data, content: e.target.value })}
+										/>
+									) : (
+										<div className="prose prose-sm dark:prose-invert max-w-none">
+											{introContent}
+										</div>
+									)}
+								</CardBox>
+							</motion.div>
 
-                                <div className='card relative overflow-hidden'>
-                                    <textarea
-                                        placeholder='Markdown 内容...'
-                                        className='min-h-[500px] w-full resize-none bg-transparent p-6 text-sm focus:outline-none font-mono leading-relaxed'
-                                        value={data.content}
-                                        onChange={e => setData({ ...data, content: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                        )
-                    ) : (
-                        // 展示模式：新增个人资料卡片区域
-                        <>
-                            <motion.div 
-                                initial={{ opacity: 0, y: 20 }} 
-                                animate={{ opacity: 1, y: 0 }} 
-                                className='mb-12 flex flex-col items-center text-center'
-                            >
-                                {/* 头像区域 */}
-                                <div className="relative mb-6 h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-lg dark:border-zinc-800">
-                                    <Image 
-                                        src="/images/avatar.png" // 确保 public/images/avatar.png 存在
-                                        alt="Avatar"
-                                        fill
-                                        className="object-cover"
-                                        priority
-                                    />
-                                </div>
-                                
-                                <h1 className='mb-3 text-4xl font-bold tracking-tight'>{data.title}</h1>
-                                <p className='text-secondary max-w-2xl text-lg'>{data.description}</p>
+							{/* 左下：技术栈 */}
+							<motion.div 
+								initial={{ opacity: 0, x: -20 }} 
+								animate={{ opacity: 1, x: 0 }} 
+								transition={{ delay: 0.1 }}
+								className="flex-1 min-h-[250px]"
+							>
+								<CardBox title="技术栈" icon={Cpu} className="h-full bg-card/50 backdrop-blur-sm">
+									{isEditMode && !isPreviewMode ? (
+										<textarea
+											placeholder="- ⚡ Next.js..."
+											className={textareaClass}
+											value={data.techStack}
+											onChange={e => setData({ ...data, techStack: e.target.value })}
+										/>
+									) : (
+										// 可以在这里给 li 加上特殊的样式，或者直接用 markdown
+										<div className="prose prose-sm dark:prose-invert max-w-none prose-li:marker:text-primary">
+											{techContent}
+										</div>
+									)}
+								</CardBox>
+							</motion.div>
+						</div>
 
-                                {/* 社交链接栏 */}
-                                <div className='mt-6 flex gap-4'>
-                                    <a href='https://github.com/spencerkk920' target='_blank' rel='noreferrer' className={socialLinkClass} title="Github">
-                                        <GithubSVG className="w-5 h-5" />
-                                    </a>
-                                    <a href='mailto:your-email@example.com' className={socialLinkClass} title="Email">
-                                        <EmailSVG className="w-5 h-5" />
-                                    </a>
-                                    <a href='https://space.bilibili.com/your-id' target='_blank' rel='noreferrer' className={socialLinkClass} title="Bilibili">
-                                        <BilibiliSVG className="w-5 h-5" />
-                                    </a>
-                                    {/* 可以在这里添加更多图标 */}
-                                </div>
-                            </motion.div>
-
-                            {loading ? (
-                                <div className='text-secondary text-center py-12'>加载内容中...</div>
-                            ) : (
-                                <motion.div 
-                                    initial={{ opacity: 0, y: 20 }} 
-                                    animate={{ opacity: 1, y: 0 }} 
-                                    transition={{ delay: 0.1 }}
-                                    className='card relative p-8 md:p-10'
-                                >
-                                    <div className='prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-img:rounded-xl'>
-                                        {content}
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            <div className='mt-12 flex justify-center'>
-                                <LikeButton slug='about-page' delay={0.2} />
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            {/* 悬浮按钮区域 (保持不变) */}
-            <motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='fixed top-4 right-6 z-10 flex gap-3 max-sm:hidden'>
-                {isEditMode ? (
-                    <>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={handleCancel}
-                            disabled={isSaving}
-                            className='rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm shadow-sm hover:bg-white/80 dark:bg-zinc-800/60 dark:hover:bg-zinc-800/80'>
-                            取消
-                        </motion.button>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setIsPreviewMode(prev => !prev)}
-                            disabled={isSaving}
-                            className={`rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm shadow-sm hover:bg-white/80 dark:bg-zinc-800/60 dark:hover:bg-zinc-800/80`}>
-                            {isPreviewMode ? '继续编辑' : '预览'}
-                        </motion.button>
-                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6 shadow-md'>
-                            {isSaving ? '保存中...' : buttonText}
-                        </motion.button>
-                    </>
-                ) : (
-                    !hideEditButton && (
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={handleEnterEditMode}
-                            className='rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80 shadow-sm dark:bg-zinc-800/60 dark:hover:bg-zinc-800/80'>
-                            编辑
-                        </motion.button>
-                    )
-                )}
-            </motion.div>
-        </>
-    )
-}
+						{/* 右侧：更新日志 (长框) */}
+						<motion.div 
+							initial={{ opacity: 0, x: 20 }} 
+							animate={{ opacity: 1, x: 0 }} 
+							transition={{ delay: 0.2 }}
+							className="lg:col-span-1 h-full min-h-
