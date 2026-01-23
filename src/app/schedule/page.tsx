@@ -157,13 +157,7 @@ export default function SchedulePage() {
             {/* 全局容器 */}
             <div className="min-h-screen w-full flex flex-col items-center pt-24 pb-12 px-4 md:px-8">
                 
-                {/* 顶部返回按钮 (固定) */}
-                <div className='fixed top-6 left-6 z-20'>
-                     <Link href="/" className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/40 dark:bg-black/40 backdrop-blur-md shadow-sm border border-white/20 hover:bg-white/60 transition-all text-secondary hover:text-primary">
-                        <ArrowLeft className="w-4 h-4" />
-                        <span className="font-medium text-sm">返回首页</span>
-                    </Link>
-                </div>
+
 
                 {/* 核心布局：Grid 容器 */}
                 {/* min-h-[720px] 强制了最小高度，h-full 强制子元素填满 */}
