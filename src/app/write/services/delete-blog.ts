@@ -16,12 +16,20 @@ export async function deleteBlog(slug: string): Promise<void> {
 	const basePath = `public/blogs/${slug}`
 
 	toast.info('正在收集文章文件...')
-	const files = await listRepoFilesRecursive(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, basePath, GITHUB_CONFIG.BRANCH)
-	if (files.length === 0) {
+	// Collect both folder-based and flat .md files
+	const folderFiles = await listRepoFilesRecursive(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, basePath, GITHUB_CONFIG.BRANCH)
+	let allFiles = [...folderFiles]
+	try {
+		const flatFiles = await listRepoFilesRecursive(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `${basePath}.md`, GITHUB_CONFIG.BRANCH)
+		allFiles = [...allFiles, ...flatFiles]
+	} catch {
+		// flat file doesn't exist — ignore
+	}
+	if (allFiles.length === 0) {
 		throw new Error('文章不存在或已删除')
 	}
 
-	const treeItems: TreeItem[] = files.map(path => ({
+	const treeItems: TreeItem[] = allFiles.map(path => ({
 		path,
 		mode: '100644',
 		type: 'blob',

@@ -19,15 +19,21 @@ export async function saveBlogEdits(originalItems: BlogIndexItem[], nextItems: B
 	for (const slug of uniqueRemoved) {
 		toast.info(`正在收集 ${slug} 文件...`)
 		const basePath = `public/blogs/${slug}`
-		const files = await listRepoFilesRecursive(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, basePath, GITHUB_CONFIG.BRANCH)
 
-		for (const path of files) {
-			treeItems.push({
-				path,
-				mode: '100644',
-				type: 'blob',
-				sha: null
-			})
+		// Delete folder-based files
+		const folderFiles = await listRepoFilesRecursive(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, basePath, GITHUB_CONFIG.BRANCH)
+		for (const path of folderFiles) {
+			treeItems.push({ path, mode: '100644', type: 'blob', sha: null })
+		}
+
+		// Also delete flat .md file if it exists
+		try {
+			const flatFiles = await listRepoFilesRecursive(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `${basePath}.md`, GITHUB_CONFIG.BRANCH)
+			for (const path of flatFiles) {
+				treeItems.push({ path, mode: '100644', type: 'blob', sha: null })
+			}
+		} catch {
+			// flat file doesn't exist — ignore
 		}
 	}
 
@@ -71,4 +77,3 @@ export async function saveBlogEdits(originalItems: BlogIndexItem[], nextItems: B
 
 	toast.success('保存成功！请等待页面部署后刷新')
 }
-
