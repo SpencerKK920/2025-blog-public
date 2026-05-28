@@ -141,7 +141,7 @@ function main() {
   if (fs.existsSync(INDEX_OUT)) {
     try {
       const oldIndex = JSON.parse(fs.readFileSync(INDEX_OUT, 'utf-8'))
-      const onBoardMap = new Map((Array.isArray(oldIndex) ? oldIndex : []).map((i: any) => [i.slug, i.onBoard]))
+      const onBoardMap = new Map((Array.isArray(oldIndex) ? oldIndex : []).map(i => [i.slug, i.onBoard]))
       for (const item of blogItems) {
         if (onBoardMap.has(item.slug) && item.onBoard === undefined) {
           item.onBoard = onBoardMap.get(item.slug)
