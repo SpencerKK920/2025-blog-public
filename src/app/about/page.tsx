@@ -21,7 +21,7 @@ import {
 // 移除报错的图标，只保留最常用的
 import { 
     SiNextdotjs, SiTypescript, SiTailwindcss, SiNginx, SiRedis, SiMongodb, SiMysql, 
-    SiPostgresql, SiVercel, SiCloudflare, SiJavascript, SiHtml5, SiCss3, SiKubernetes,
+    SiPostgresql, SiVercel, SiCloudflare, SiJavascript, SiHtml5, SiCss, SiKubernetes,
     SiVuedotjs, SiGo, SiSvelte, SiAngular, SiKotlin,
     SiSupabase, SiFirebase, SiPrisma, SiExpress, SiVite, 
     SiFlutter, SiGithub, SiNotion, SiPostman, SiIntellijidea
@@ -56,7 +56,7 @@ const ALL_ICONS: TechIconDef[] = [
     { id: 'svelte', label: 'Svelte', icon: SiSvelte, color: 'text-orange-500', bg: 'bg-orange-500/10', category: 'front' },
     { id: 'tailwind', label: 'Tailwind', icon: SiTailwindcss, color: 'text-cyan-400', bg: 'bg-cyan-400/10', category: 'front' },
     { id: 'html', label: 'HTML5', icon: SiHtml5, color: 'text-orange-500', bg: 'bg-orange-500/10', category: 'front' },
-    { id: 'css', label: 'CSS3', icon: SiCss3, color: 'text-blue-500', bg: 'bg-blue-500/10', category: 'front' },
+    { id: 'css', label: 'CSS3', icon: SiCss, color: 'text-blue-500', bg: 'bg-blue-500/10', category: 'front' },
     { id: 'vite', label: 'Vite', icon: SiVite, color: 'text-purple-500', bg: 'bg-purple-500/10', category: 'front' },
     { id: 'flutter', label: 'Flutter', icon: SiFlutter, color: 'text-cyan-400', bg: 'bg-cyan-400/10', category: 'front' },
 
@@ -229,7 +229,8 @@ const CardBox = ({ title, icon: Icon, children, className = '' }: { title?: stri
 )
 
 export default function Page() {
-	const safeInitialData = { title: '', description: '', content: '', techStack: '', changelog: '', ...initialData } as AboutData
+		const defaultData = { title: '', description: '', content: '', techStack: '', changelog: '' }
+		const safeInitialData = { ...defaultData, ...initialData } as AboutData
 
 	const [data, setData] = useState<AboutData>(safeInitialData)
 	const [originalData, setOriginalData] = useState<AboutData>(safeInitialData)
