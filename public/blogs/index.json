@@ -33,12 +33,11 @@
       "Oracle",
       "虚拟机"
     ],
-    "date": "2026-05-28",
+    "date": "2026-05-28T08:00",
     "summary": "VMware虚拟机安装、CentOS系统配置、Oracle数据库静默安装与MySQL主从配置完整记录",
     "cover": "",
     "hidden": false,
-    "category": "Linux",
-    "onBoard": false
+    "category": "Linux"
   },
   {
     "slug": "blog-2",
