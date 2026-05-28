@@ -12,7 +12,8 @@
     "date": "2026-05-28T08:00",
     "summary": "VMware虚拟机安装、CentOS系统配置、Oracle数据库静默安装与MySQL主从配置完整记录",
     "hidden": false,
-    "category": "Linux"
+    "category": "Linux",
+    "onBoard": false
   },
   {
     "slug": "blog-2",
