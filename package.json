@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 2025",
+    "prebuild": "node scripts/gen-blogs-index.js",
+    "prebuild:cf": "node scripts/gen-blogs-index.js",
     "svg": "node scripts/gen-svgs-index.js",
     "build": "next build",
     "start": "next start",
@@ -17,6 +19,7 @@
     "@types/jsrsasign": "^10.5.15",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.18",
+    "gray-matter": "^4.0.3",
     "html-react-parser": "^5.2.8",
     "jsrsasign": "^11.1.0",
     "katex": "^0.16.27",

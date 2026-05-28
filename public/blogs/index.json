@@ -1,5 +1,29 @@
 [
   {
+    "slug": "0-项目初始化配置",
+    "title": "项目初始化",
+    "tags": [
+      "Linux"
+    ],
+    "date": "2026-05-28T08:00",
+    "summary": "这是一个测试2",
+    "cover": "",
+    "hidden": false,
+    "category": "项目"
+  },
+  {
+    "slug": "Test",
+    "title": "标题",
+    "tags": [
+      "Linux"
+    ],
+    "date": "2026-05-28T08:00",
+    "summary": "这是一个测试",
+    "cover": "",
+    "hidden": false,
+    "category": "Linux"
+  },
+  {
     "slug": "vmware-install",
     "title": "VMware虚拟机安装与数据库配置",
     "tags": [
@@ -9,8 +33,9 @@
       "Oracle",
       "虚拟机"
     ],
-    "date": "2026-05-28T08:00",
+    "date": "2026-05-28",
     "summary": "VMware虚拟机安装、CentOS系统配置、Oracle数据库静默安装与MySQL主从配置完整记录",
+    "cover": "",
     "hidden": false,
     "category": "Linux",
     "onBoard": false
@@ -43,6 +68,6 @@
     "summary": "",
     "cover": "/blogs/1/9ee92269aee9fafc.webp",
     "hidden": false,
-    "category": "奇技淫巧"
+    "category": ""
   }
 ]

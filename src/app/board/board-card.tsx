@@ -25,14 +25,16 @@ export function BoardCard({ post, index, isRead, editMode, onEditClick }: BoardC
                 onClick={editMode ? (e) => onEditClick?.(e, post.slug) : undefined}
                 className="flex flex-col sm:flex-row h-full sm:h-48 overflow-hidden squircle bg-card border shadow-sm hover:shadow-xl hover:border-brand/30 transition-all duration-300"
             >
-                {/* Cover */}
-                <div className="relative w-full sm:w-72 h-48 sm:h-full overflow-hidden shrink-0 bg-secondary/5 border-r border-border/50">
-                    <img
-                        src={post.cover}
-                        alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                </div>
+                {/* Cover — only shown when present */}
+                {post.cover && (
+                    <div className="relative w-full sm:w-72 h-48 sm:h-full overflow-hidden shrink-0 bg-secondary/5 border-r border-border/50">
+                        <img
+                            src={post.cover}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                    </div>
+                )}
 
                 {/* Content */}
                 <div className="flex-1 flex flex-col p-6">

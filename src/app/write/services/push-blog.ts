@@ -109,33 +109,29 @@ export async function pushBlog(params: PushBlogParams): Promise<void> {
 
 	toast.info('正在创建文件...')
 
-	// create blob for index.md
-	const mdBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(mdToUpload), 'base64')
+	// Build frontmatter
+	const dateStr = form.date || formatDateTimeLocal()
+	const fmLines = [
+		'---',
+		`title: "${(form.title || '').replace(/"/g, '\\"')}"`,
+		`tags: [${(form.tags || []).map(t => `"${t}"`).join(', ')}]`,
+		`date: "${dateStr}"`,
+		`summary: "${(form.summary || '').replace(/"/g, '\\"')}"`,
+		`cover: "${(coverPath || '').replace(/"/g, '\\"')}"`,
+		`hidden: ${form.hidden ? 'true' : 'false'}`,
+		`category: "${(form.category || '').replace(/"/g, '\\"')}"`,
+		'---',
+		''
+	]
+	const mdWithFrontmatter = fmLines.join('\n') + '\n' + mdToUpload
+
+	// create blob for index.md (with frontmatter)
+	const mdBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(mdWithFrontmatter), 'base64')
 	treeItems.push({
 		path: `${basePath}/index.md`,
 		mode: '100644',
 		type: 'blob',
 		sha: mdBlob.sha
-	})
-
-	// create blob for config.json
-	const dateStr = form.date || formatDateTimeLocal()
-	const config = {
-		title: form.title,
-		tags: form.tags,
-		date: dateStr,
-		summary: form.summary,
-		cover: coverPath,
-		hidden: form.hidden,
-		category: form.category
-	}
-
-	const configBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(JSON.stringify(config, null, 2)), 'base64')
-	treeItems.push({
-		path: `${basePath}/config.json`,
-		mode: '100644',
-		type: 'blob',
-		sha: configBlob.sha
 	})
 
 	// prepare and create blob for blogs index
