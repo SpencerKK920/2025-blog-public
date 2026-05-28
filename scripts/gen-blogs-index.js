@@ -137,6 +137,21 @@ function main() {
 
   blogItems.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
+  // Preserve onBoard values from existing index (set via web editor, not in frontmatter)
+  if (fs.existsSync(INDEX_OUT)) {
+    try {
+      const oldIndex = JSON.parse(fs.readFileSync(INDEX_OUT, 'utf-8'))
+      const onBoardMap = new Map((Array.isArray(oldIndex) ? oldIndex : []).map((i: any) => [i.slug, i.onBoard]))
+      for (const item of blogItems) {
+        if (onBoardMap.has(item.slug) && item.onBoard === undefined) {
+          item.onBoard = onBoardMap.get(item.slug)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to preserve onBoard from existing index:', err.message)
+    }
+  }
+
   fs.writeFileSync(INDEX_OUT, JSON.stringify(blogItems, null, 2))
   console.log(`Generated ${INDEX_OUT} with ${blogItems.length} articles.`)
 
