@@ -13,8 +13,7 @@
     "summary": "VMware虚拟机安装、CentOS系统配置、Oracle数据库静默安装与MySQL主从配置完整记录",
     "cover": "",
     "hidden": false,
-    "category": "Linux",
-    "onBoard": false
+    "category": "Linux"
   },
   {
     "slug": "0-项目初始化配置",
@@ -27,18 +26,6 @@
     "cover": "",
     "hidden": false,
     "category": "项目"
-  },
-  {
-    "slug": "Test",
-    "title": "标题",
-    "tags": [
-      "Linux"
-    ],
-    "date": "2026-05-28T00:00",
-    "summary": "这是一个测试",
-    "cover": "",
-    "hidden": false,
-    "category": "Linux"
   },
   {
     "slug": "blog-2",
