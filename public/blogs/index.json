@@ -14,7 +14,7 @@
     "cover": "",
     "hidden": false,
     "category": "Linux",
-    "onBoard": false
+    "onBoard": true
   },
   {
     "slug": "blog-2",
