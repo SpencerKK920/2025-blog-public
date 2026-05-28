@@ -1,7 +1,7 @@
 # 一.安装 Vm ware 虚拟机软件
 ## 1.进入官网进行下载
 https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion
-[图片]
+
 
 
 ## 2.点击下载，跳转新网页注册登录，然后下载
