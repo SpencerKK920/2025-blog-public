@@ -1,1 +1,13 @@
-[]
+[
+	{
+		"name": "Sanyue ImgHub",
+		"year": 2026,
+		"image": "blob:https://blog.2131245.xyz/366bcaec-4a1d-4c88-be46-3b4293c7a64a",
+		"url": "https://image.2131245.xyz/",
+		"description": "由开源项目，自己搭建的个人图床，Tg为存储数据库，感谢大佬",
+		"tags": [
+			"图床"
+		],
+		"github": "https://github.com/MarSeventh/CloudFlare-ImgBed"
+	}
+]
