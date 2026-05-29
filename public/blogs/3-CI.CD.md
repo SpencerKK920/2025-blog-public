@@ -1,3 +1,21 @@
+---
+title: " CI/CD"
+tags:
+  - Dev
+date: 2026-05-29
+summary: CI/CD基础概念
+cover: ""
+hidden: false
+category: 开发
+---
+
+
+
+
+
+
+
+
 # 一.基本概念
 ## CI (持续集成)
 开发人员提交代码到 Main 主分支，然后系统进行自动构建，编译测试，进行质量检查，把成功/失败结果反馈给开发人员
