@@ -3,6 +3,7 @@ import { PropsWithChildren } from 'react'
 import { useCenterInit } from '@/hooks/use-center'
 import BlurredBubblesBackground from './backgrounds/blurred-bubbles'
 import SiteHeader from '@/components/site-header'
+import SnowfallBackground from './backgrounds/snowfall'
 import { Toaster } from 'sonner'
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon } from 'lucide-react'
 import { useSize, useSizeInit } from '@/hooks/use-size'
@@ -51,6 +52,7 @@ export default function Layout({ children }: PropsWithChildren) {
 				/>
 			)}
 			<BlurredBubblesBackground colors={siteContent.backgroundColors} regenerateKey={regenerateKey} />
+			{siteContent.enableChristmas && <SnowfallBackground zIndex={0} count={!maxSM ? 125 : 20} />}
 
 			<SiteHeader />
 			<main className='relative z-10 h-full'>
