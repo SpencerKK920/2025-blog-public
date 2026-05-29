@@ -9,7 +9,7 @@ export default function SidebarDaily() {
 	if (items.length === 0) return null
 
 	return (
-		<div className='bg-card rounded-xl border p-4'>
+		<div className='bg-white/30 backdrop-blur-sm rounded-xl border border-white/20 p-4'>
 			<h3 className='text-secondary mb-3 text-xs font-medium tracking-widest uppercase'>
 				日常动态
 				<Link href='/pictures' className='text-brand/50 ml-2 font-normal hover:text-brand'>

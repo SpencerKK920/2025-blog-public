@@ -395,7 +395,7 @@ export default function KbPage() {
             {/* Edit controls */}
             <AnimatePresence>
                 {editMode && (
-                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="fixed top-4 right-6 z-30 flex items-center gap-3">
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="fixed top-16 right-6 z-50 flex items-center gap-3">
                         {enableCategories && (
                             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setCategoryModalOpen(true)} disabled={saving} className="rounded-xl border bg-white/60 px-4 py-2 text-sm backdrop-blur-sm hover:bg-white/80">分类</motion.button>
                         )}
@@ -408,7 +408,7 @@ export default function KbPage() {
             </AnimatePresence>
 
             {!editMode && !hideEditButton && (
-                <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={toggleEditMode} className="fixed top-4 right-6 z-20 rounded-xl border bg-white/60 backdrop-blur-sm px-6 py-2 text-sm hover:bg-white/80">编辑</motion.button>
+                <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={toggleEditMode} className="fixed top-16 right-6 z-50 rounded-xl border bg-white/60 backdrop-blur-sm px-6 py-2 text-sm hover:bg-white/80">编辑</motion.button>
             )}
 
             <CategoryModal

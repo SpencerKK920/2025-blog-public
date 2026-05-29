@@ -16,7 +16,7 @@ export default function SidebarStats({ items }: Props) {
 	}, [items])
 
 	return (
-		<div className='bg-card rounded-xl border p-4'>
+		<div className='bg-white/30 backdrop-blur-sm rounded-xl border border-white/20 p-4'>
 			<h3 className='text-secondary mb-3 text-xs font-medium tracking-widest uppercase'>站点统计</h3>
 			<div className='grid grid-cols-3 gap-2 text-center'>
 				<div>

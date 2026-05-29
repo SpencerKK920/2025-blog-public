@@ -19,7 +19,7 @@ export default function HeroArea({ items }: { items: BlogIndexItem[] }) {
 	const timeStr = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
 
 	return (
-		<div className='mb-8 rounded-2xl border bg-white/80 p-6'>
+		<div className='mb-8 rounded-2xl border border-white/20 bg-white/30 p-6 backdrop-blur-sm'>
 			<div className='flex flex-col items-center gap-6 sm:flex-row sm:items-start'>
 				<img
 					src='/images/avatar.png'

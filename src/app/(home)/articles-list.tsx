@@ -19,7 +19,7 @@ export default function ArticlesList({ items }: Props) {
 				<Link
 					key={post.slug}
 					href={`/blog/${post.slug}`}
-					className='group flex h-full flex-col overflow-hidden rounded-2xl border bg-white/80 transition-shadow hover:shadow-lg'
+					className='group flex h-full flex-col overflow-hidden rounded-2xl border border-white/20 bg-white/40 backdrop-blur-sm transition-shadow hover:shadow-lg'
 				>
 					{post.cover ? (
 						<div className='h-48 w-full shrink-0 overflow-hidden'>

@@ -20,7 +20,7 @@ export default function SiteHeader() {
 	const { siteContent } = useConfigStore()
 
 	return (
-		<header className='fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-white/80 backdrop-blur-md'>
+		<header className='fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-white/40 backdrop-blur-md'>
 			<div className='mx-auto flex max-w-7xl items-center justify-between px-8 py-3'>
 				<Link href='/' className='shrink-0'>
 					<span className='font-averia text-lg font-medium'>{siteContent.meta.title || 'YiKG'}</span>

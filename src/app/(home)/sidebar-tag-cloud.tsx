@@ -23,7 +23,7 @@ export default function SidebarTagCloud({ items }: Props) {
 	const maxCount = tags[0]?.[1] || 1
 
 	return (
-		<div className='bg-card rounded-xl border p-4'>
+		<div className='bg-white/30 backdrop-blur-sm rounded-xl border border-white/20 p-4'>
 			<h3 className='text-secondary mb-3 text-xs font-medium tracking-widest uppercase'>标签云</h3>
 			<div className='flex flex-wrap gap-1.5'>
 				{tags.map(([tag, count]) => {

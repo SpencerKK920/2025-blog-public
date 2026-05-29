@@ -41,7 +41,7 @@ export default function Home() {
 			<div className='mt-8 flex flex-col gap-8 lg:flex-row'>
 				{/* Articles list (left) */}
 				<main className='min-w-0 flex-1'>
-					<div className='rounded-2xl border bg-white/60 p-5'>
+					<div className='rounded-2xl border border-white/20 bg-white/30 p-5 backdrop-blur-sm'>
 						{selectedCategory ? (
 							<div className='mb-4 flex items-center gap-3'>
 								<h2 className='text-sm font-bold text-brand'>{selectedCategory}</h2>

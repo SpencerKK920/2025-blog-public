@@ -418,7 +418,7 @@ export default function BoardPage() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="fixed top-4 right-6 z-30 flex items-center gap-3"
+                        className="fixed top-16 right-6 z-50 flex items-center gap-3 mr-60"
                     >
                         {enableCategories && (
                             <motion.button
@@ -478,7 +478,7 @@ export default function BoardPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={toggleEditMode}
-                    className="fixed top-4 right-6 z-20 rounded-xl border bg-white/60 backdrop-blur-sm px-6 py-2 text-sm hover:bg-white/80"
+                    className="fixed top-16 left-6 z-50 rounded-xl border bg-white/60 backdrop-blur-sm px-6 py-2 text-sm hover:bg-white/80"
                 >
                     编辑
                 </motion.button>
