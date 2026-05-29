@@ -1,11 +1,12 @@
 ---
-title: " 标题"
+title: " Redis"
 tags:
-date: 2026-05-28
-summary:
+  - 数据库
+date: 2026-05-29
+summary: B站Redis笔记
 cover: ""
 hidden: false
-category:
+category: 数据库
 ---
 # 一.数据结构类型
 ## 1.字符串
