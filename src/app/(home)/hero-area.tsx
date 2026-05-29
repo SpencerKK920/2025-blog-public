@@ -76,11 +76,16 @@ export default function HeroArea({ items }: { items: BlogIndexItem[] }) {
 							{socialButtons.map(btn => {
 								const Icon = ICON_MAP[btn.type]
 								if (!Icon) return null
+								const isGithub = btn.type === 'github'
 								return (
 									<button
 										key={btn.id}
 										onClick={() => handleSocialClick(btn)}
-										className='rounded-full border border-white/30 bg-white/50 p-1.5 transition-colors hover:bg-white/80 hover:shadow-sm'
+										className={`rounded-full border border-white/30 p-1.5 transition-colors hover:shadow-sm ${
+											isGithub
+												? 'bg-[#24292f] dark:bg-[#24292f]'
+												: 'bg-white/50 hover:bg-white/80'
+										}`}
 										title={btn.label || btn.type}
 									>
 										<Icon className='h-4 w-4' />
