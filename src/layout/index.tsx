@@ -1,5 +1,5 @@
 'use client'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, Suspense } from 'react'
 import { useCenterInit } from '@/hooks/use-center'
 import BlurredBubblesBackground from './backgrounds/blurred-bubbles'
 import SiteHeader from '@/components/site-header'
@@ -54,7 +54,9 @@ export default function Layout({ children }: PropsWithChildren) {
 			<BlurredBubblesBackground colors={siteContent.backgroundColors} regenerateKey={regenerateKey} />
 			{siteContent.enableChristmas && <SnowfallBackground zIndex={0} count={!maxSM ? 125 : 20} />}
 
-			<SiteHeader />
+			<Suspense fallback={null}>
+				<SiteHeader />
+			</Suspense>
 			<main className='relative z-10 h-full'>
 				{children}
 			</main>

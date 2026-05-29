@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSize } from '@/hooks/use-size'
 import { useBlogIndex } from '@/hooks/use-blog-index'
 import HeroArea from './hero-area'
@@ -11,15 +12,22 @@ import SidebarTagCloud from './sidebar-tag-cloud'
 import SidebarUpdates from './sidebar-updates'
 import SidebarDaily from './sidebar-daily'
 
-export default function Home() {
+function HomeContent() {
+	const searchParams = useSearchParams()
 	const { maxSM } = useSize()
 	const { boardItems: items, loading } = useBlogIndex()
 	const [selectedCategory, setSelectedCategory] = useState<string>('')
+	const searchQuery = searchParams.get('q') || ''
 
 	const filtered = useMemo(() => {
-		if (!selectedCategory) return items
-		return items.filter(i => i.category === selectedCategory)
-	}, [items, selectedCategory])
+		let result = items
+		if (selectedCategory) result = result.filter(i => i.category === selectedCategory)
+		if (searchQuery.trim()) {
+			const q = searchQuery.trim().toLowerCase()
+			result = result.filter(i => i.title.toLowerCase().includes(q) || (i.summary || '').toLowerCase().includes(q))
+		}
+		return result
+	}, [items, selectedCategory, searchQuery])
 
 	if (loading) {
 		return (
@@ -67,5 +75,18 @@ export default function Home() {
 				)}
 			</div>
 		</div>
+	)
+}
+
+
+export default function Page() {
+	return (
+		<Suspense fallback={
+			<div className="flex min-h-screen items-center justify-center">
+				<div className="h-8 w-8 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
+			</div>
+		}>
+			<HomeContent />
+		</Suspense>
 	)
 }
