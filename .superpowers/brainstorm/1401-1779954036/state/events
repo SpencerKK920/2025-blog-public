@@ -1,0 +1,4 @@
+{"type":"click","text":"C\n    \n      窄栏列表 + 宽看板 + 可折叠右侧\n      左 200px 极窄时间轴 | 中 flex-1 卡片看板 | 右侧面板默认折叠点击标签/分类按钮展开右侧抽屉，适合移动端友好","choice":"c","id":null,"timestamp":1779954169237}
+{"type":"click","text":"D1\n    \n      时间列表联动看板\n      左侧点击某年/某月，中间看板自动滚动到对应文章区域","choice":"d1","id":null,"timestamp":1779954171182}
+{"type":"click","text":"D2\n    \n      标签筛选激活态\n      右侧标签可多选筛选，看板实时过滤显示匹配文章（标签 OR 逻辑）","choice":"d2","id":null,"timestamp":1779954172738}
+{"type":"click","text":"D3\n    \n      保留编辑模式入口\n      右上角保留「编辑」按钮，进入后左侧列表变为勾选模式（复用 blog 页编辑逻辑）","choice":"d3","id":null,"timestamp":1779954173418}

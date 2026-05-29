@@ -1,0 +1,54 @@
+<h2>文章看板 + 文章列表 合并方案</h2>
+<p class="subtitle">三种布局策略，点击选择你偏好的方向（可多选偏好元素）</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>三栏等比布局</h3>
+      <p>左 25% 时间列表 | 中 50% 卡片看板 | 右 25% 标签/分类侧栏 <br>参考 Notion/Linear 的三栏信息架构，所有信息一目了然</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>两栏布局 + 浮动标签云</h3>
+      <p>左 30% 时间列表 | 右 70% 卡片看板（宽屏更舒适）<br>标签以胶囊形式浮在卡片区域顶部，点击筛选，不占独立列</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>窄栏列表 + 宽看板 + 可折叠右侧</h3>
+      <p>左 200px 极窄时间轴 | 中 flex-1 卡片看板 | 右侧面板默认折叠<br>点击标签/分类按钮展开右侧抽屉，适合移动端友好</p>
+    </div>
+  </div>
+</div>
+
+<hr style="margin: 2rem 0; opacity: 0.2;">
+
+<h3>交互细节偏好（可多选）</h3>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="d1" onclick="toggleSelect(this)">
+    <div class="letter">D1</div>
+    <div class="content">
+      <h3>时间列表联动看板</h3>
+      <p>左侧点击某年/某月，中间看板自动滚动到对应文章区域</p>
+    </div>
+  </div>
+  <div class="option" data-choice="d2" onclick="toggleSelect(this)">
+    <div class="letter">D2</div>
+    <div class="content">
+      <h3>标签筛选激活态</h3>
+      <p>右侧标签可多选筛选，看板实时过滤显示匹配文章（标签 OR 逻辑）</p>
+    </div>
+  </div>
+  <div class="option" data-choice="d3" onclick="toggleSelect(this)">
+    <div class="letter">D3</div>
+    <div class="content">
+      <h3>保留编辑模式入口</h3>
+      <p>右上角保留「编辑」按钮，进入后左侧列表变为勾选模式（复用 blog 页编辑逻辑）</p>
+    </div>
+  </div>
+</div>
