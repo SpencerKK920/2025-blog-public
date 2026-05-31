@@ -1,5 +1,17 @@
 [
   {
+    "slug": "%E6%96%B0%E7%82%AC",
+    "title": "新炬-Orecle安装及Mysql主从复制搭建",
+    "tags": [
+      "数据库",
+      "面试"
+    ],
+    "date": "2026-05-31T08:00",
+    "summary": "Orecle安装及Mysql主从复制搭建",
+    "hidden": false,
+    "category": "数据库"
+  },
+  {
     "slug": "新炬",
     "title": "新炬-Orecle安装及Mysql主从复制搭建",
     "tags": [
