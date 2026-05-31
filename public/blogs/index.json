@@ -1,19 +1,15 @@
 [
   {
-    "slug": "vmware-install",
-    "title": "VMware虚拟机安装与数据库配置",
+    "slug": "新炬",
+    "title": "新炬-Orecle安装及Mysql主从复制搭建",
     "tags": [
-      "Linux",
-      "VMware",
-      "MySQL",
-      "Oracle",
-      "虚拟机"
+      "数据库"
     ],
-    "date": "2026-05-28T08:00",
-    "summary": "VMware虚拟机安装、CentOS系统配置、Oracle数据库静默安装与MySQL主从配置完整记录",
+    "date": "2026-05-31T00:00",
+    "summary": "Orecle安装及Mysql主从复制搭建",
     "cover": "",
     "hidden": false,
-    "category": "Linux"
+    "category": "数据库"
   },
   {
     "slug": "blog-2",
