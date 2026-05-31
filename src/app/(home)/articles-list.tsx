@@ -30,8 +30,8 @@ export default function ArticlesList({ items }: Props) {
 							/>
 						</div>
 					) : (
-						<div className='flex h-48 w-full shrink-0 items-center justify-center bg-gradient-to-br from-brand/5 via-secondary/5 to-brand/10'>
-							<span className='text-secondary/30 text-4xl'>&#9998;</span>
+						<div className='flex h-48 w-full shrink-0 items-center justify-center bg-gradient-to-br from-brand/30 via-brand/20 to-brand-secondary/30 p-6'>
+							<span className='text-center text-xl font-bold text-white/90 leading-snug drop-shadow-sm'>{post.title}</span>
 						</div>
 					)}
 					<div className='flex flex-1 flex-col p-5'>
