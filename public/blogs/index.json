@@ -1,5 +1,21 @@
 [
   {
+    "slug": "vmware-install",
+    "title": "VMware虚拟机安装与数据库配置",
+    "tags": [
+      "Linux",
+      "VMware",
+      "MySQL",
+      "Oracle",
+      "虚拟机"
+    ],
+    "date": "2026-05-28T08:00",
+    "summary": "VMware虚拟机安装、CentOS系统配置、Oracle数据库静默安装与MySQL主从配置完整记录",
+    "cover": "",
+    "hidden": false,
+    "category": "Linux"
+  },
+  {
     "slug": "blog-2",
     "title": "个人博客开发（一）影视追踪功能",
     "tags": [],
