@@ -5,5 +5,12 @@
 		"url": "https://www.ruanyifeng.com/blog/archives.html",
 		"description": "经典必看，每周更新。无聊是看新闻、还是学习、还是拓展眼界，都是能其中获取到乐趣的。还有很多网友的每周留言。这就是 blog 的含金量。",
 		"stars": 5
+	},
+	{
+		"name": "路飞的博客",
+		"avatar": "https://blog.lufei.de/favicon.ico",
+		"url": "https://blog.lufei.de/",
+		"description": "面向Linux运维和开发的一站式脚本工具箱，整理大量一键脚本",
+		"stars": 5
 	}
 ]
