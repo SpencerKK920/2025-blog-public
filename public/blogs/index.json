@@ -1,5 +1,16 @@
 [
   {
+    "slug": "1-Redis",
+    "title": "Redis",
+    "tags": [
+      "数据库"
+    ],
+    "date": "2026-06-01T08:00",
+    "summary": "B站Redis笔记  BV1Jj411D7oG",
+    "hidden": false,
+    "category": "数据库"
+  },
+  {
     "slug": "新炬",
     "title": "新炬-Orecle安装及Mysql主从复制搭建",
     "tags": [
@@ -7,18 +18,6 @@
     ],
     "date": "2026-05-31T08:00",
     "summary": "Orecle安装及Mysql主从复制搭建",
-    "cover": "",
-    "hidden": false,
-    "category": "数据库"
-  },
-  {
-    "slug": "1-Redis",
-    "title": "Redis",
-    "tags": [
-      "数据库"
-    ],
-    "date": "2026-05-29T08:00",
-    "summary": "B站Redis笔记  BV1Jj411D7oG",
     "cover": "",
     "hidden": false,
     "category": "数据库"
