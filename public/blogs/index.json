@@ -1,5 +1,30 @@
 [
   {
+    "slug": "苏州千视通-长沙-运维实习（驻场）",
+    "title": "苏州千视通-长沙-运维实习（驻场）",
+    "tags": [
+      "面试"
+    ],
+    "date": "2026-09-19T08:00",
+    "summary": "面经",
+    "cover": "",
+    "hidden": false,
+    "category": "面试"
+  },
+  {
+    "slug": "6-Zabbix",
+    "title": "Zabbix",
+    "tags": [
+      "Linux",
+      "监控"
+    ],
+    "date": "2026-06-07T08:00",
+    "summary": "Zabbix安装到监控",
+    "cover": "",
+    "hidden": false,
+    "category": "Linux"
+  },
+  {
     "slug": "1-Redis",
     "title": "Redis",
     "tags": [
@@ -7,6 +32,7 @@
     ],
     "date": "2026-06-01T08:00",
     "summary": "B站Redis笔记  BV1Jj411D7oG",
+    "cover": "",
     "hidden": false,
     "category": "数据库"
   },

@@ -28,21 +28,17 @@ export function useBlogIndex() {
 		result = result.filter(item => !item.hidden)
 	}
 
-	// Old articles without onBoard default to true (show on board)
-	const boardItems = result.filter(item => item.onBoard !== false)
-
 	return {
 		items: result,
-		boardItems,
 		loading: isLoading,
 		error
 	}
 }
 
 export function useLatestBlog() {
-	const { boardItems, loading, error } = useBlogIndex()
+	const { items, loading, error } = useBlogIndex()
 
-	const latestBlog = boardItems.length > 0 ? boardItems.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0] : null
+	const latestBlog = items.length > 0 ? [...items].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0] : null
 
 	return {
 		blog: latestBlog,

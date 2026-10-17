@@ -7,8 +7,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import { useCenterStore } from '@/hooks/use-center'
 import { CARD_SPACING } from '@/consts'
-import BookshelfOutlineSVG from '@/svgs/bookshelf-outline.svg'
-import BookshelfFilledSVG from '@/svgs/bookshelf-filled.svg'
 import ProjectsFilledSVG from '@/svgs/projects-filled.svg'
 import ProjectsOutlineSVG from '@/svgs/projects-outline.svg'
 import AboutFilledSVG from '@/svgs/about-filled.svg'
@@ -22,19 +20,11 @@ import { cn } from '@/lib/utils'
 import { useSize } from '@/hooks/use-size'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { HomeDraggableLayer } from '@/app/(home)/home-draggable-layer'
-import BilibiliOutlineSVG from '@/svgs/bilibili-outline.svg'
-import BilibiliFilledSVG from '@/svgs/bilibili-filled.svg'
 import TraktOutlineSVG from '@/svgs/trakt-outline.svg'
 import TraktFilledSVG from '@/svgs/trakt-filled.svg'
 
 
 const list = [
-   {
-        icon: BookshelfOutlineSVG,
-        iconActive: BookshelfFilledSVG,
-        label: '知识库',
-        href: '/kb'
-    },
 	   {
         icon: TraktOutlineSVG,
         iconActive: TraktFilledSVG,
@@ -58,12 +48,6 @@ const list = [
 		iconActive: ShareFilledSVG,
 		label: '推荐分享',
 		href: '/share'
-	},
-	{
-		icon: BilibiliOutlineSVG,
-		iconActive: BilibiliFilledSVG,      
-		label: '影视记录',
-		href: '/anime'
 	},
 ]
 

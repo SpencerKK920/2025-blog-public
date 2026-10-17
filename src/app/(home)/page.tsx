@@ -15,7 +15,7 @@ import SidebarDaily from './sidebar-daily'
 function HomeContent() {
 	const searchParams = useSearchParams()
 	const { maxSM } = useSize()
-	const { boardItems: items, loading } = useBlogIndex()
+	const { items, loading } = useBlogIndex()
 	const [selectedCategory, setSelectedCategory] = useState<string>('')
 	const searchQuery = searchParams.get('q') || ''
 

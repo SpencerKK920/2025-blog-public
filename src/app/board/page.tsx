@@ -1,11 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { toast } from 'sonner'
 import { Check } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 
 dayjs.extend(weekOfYear)
 
@@ -22,8 +23,9 @@ import { BoardCard } from './board-card'
 import { Timeline } from './timeline'
 import { TagPanel } from './tag-panel'
 
-export default function BoardPage() {
-    const { boardItems: items, loading } = useBlogIndex()
+function BoardContent() {
+    const searchParams = useSearchParams()
+    const { items, loading } = useBlogIndex()
     const { categories: categoriesFromServer } = useCategories()
     const { isRead } = useReadArticles()
     const { isAuth, setPrivateKey } = useAuthStore()
@@ -34,8 +36,13 @@ export default function BoardPage() {
     const keyInputRef = useRef<HTMLInputElement>(null)
     const groupRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
-    // --- tag filter state ---
-    const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
+    // --- filter state (category + tag) ---
+    const [selectedTags, setSelectedTags] = useState<Set<string>>(
+        () => new Set((searchParams.get('tag') || '').split(',').filter(Boolean))
+    )
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(
+        () => searchParams.get('category') || null
+    )
     const [tagPanelOpen, setTagPanelOpen] = useState(false)
     const [activeGroup, setActiveGroup] = useState<string | null>(null)
 
@@ -56,13 +63,25 @@ export default function BoardPage() {
         setCategoryList(categoriesFromServer || [])
     }, [categoriesFromServer])
 
-    // --- tag filtering ---
+    // --- filtering (category + tag) ---
+    const categoryCounts = useMemo(() => {
+        const map: Record<string, number> = {}
+        items.forEach(item => {
+            const cat = item.category
+            if (!cat) return
+            map[cat] = (map[cat] || 0) + 1
+        })
+        return Object.entries(map).sort((a, b) => b[1] - a[1])
+    }, [items])
+
     const filteredItems = useMemo(() => {
-        if (selectedTags.size === 0) return items
-        return items.filter(item =>
+        let result = items
+        if (selectedCategory) result = result.filter(item => item.category === selectedCategory)
+        if (selectedTags.size > 0) result = result.filter(item =>
             (item.tags || []).some(tag => selectedTags.has(tag))
         )
-    }, [items, selectedTags])
+        return result
+    }, [items, selectedCategory, selectedTags])
 
     // --- time grouping for board ---
     const { groupedItems, groupKeys } = useMemo(() => {
@@ -306,6 +325,36 @@ export default function BoardPage() {
 
                         {/* Center: Board */}
                         <main className="flex-1 min-w-0 px-4 md:px-6">
+                            {categoryCounts.length > 0 && (
+                                <div className="mb-6 flex flex-wrap items-center gap-2">
+                                    <button
+                                        onClick={() => setSelectedCategory(null)}
+                                        className={cn(
+                                            'rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border',
+                                            selectedCategory === null
+                                                ? 'bg-brand text-white border-brand'
+                                                : 'bg-white/40 text-secondary border-white/40 hover:text-brand hover:border-brand/30'
+                                        )}
+                                    >
+                                        全部
+                                    </button>
+                                    {categoryCounts.map(([cat, count]) => (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setSelectedCategory(cat)}
+                                            className={cn(
+                                                'rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border',
+                                                selectedCategory === cat
+                                                    ? 'bg-brand text-white border-brand'
+                                                    : 'bg-white/40 text-secondary border-white/40 hover:text-brand hover:border-brand/30'
+                                            )}
+                                        >
+                                            {cat}
+                                            <span className="ml-1 opacity-60">{count}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                             {groupKeys.length > 0 ? (
                                 <div className="flex flex-col gap-8">
                                     {groupKeys.map(key => {
@@ -393,7 +442,7 @@ export default function BoardPage() {
                                 </div>
                             ) : (
                                 <div className="text-center py-20 opacity-20 italic">
-                                    {selectedTags.size > 0 ? '没有匹配的文章' : 'No articles found.'}
+                                    {(selectedTags.size > 0 || selectedCategory) ? '没有匹配的文章' : 'No articles found.'}
                                 </div>
                             )}
                         </main>
@@ -497,5 +546,17 @@ export default function BoardPage() {
                 onAssignCategory={handleAssignCategory}
             />
         </>
+    )
+}
+
+export default function BoardPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
+            </div>
+        }>
+            <BoardContent />
+        </Suspense>
     )
 }

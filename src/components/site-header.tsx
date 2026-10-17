@@ -9,11 +9,9 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 
 const links = [
 	{ label: '首页', href: '/' },
-	{ label: '知识库', href: '/kb' },
 	{ label: '看板', href: '/board' },
 	{ label: '项目', href: '/projects' },
 	{ label: '推荐', href: '/share' },
-	{ label: '影视', href: '/anime' },
 	{ label: '关于', href: '/about' }
 ]
 
